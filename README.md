@@ -1,11 +1,14 @@
-## This is a template (made by Branzz) for yew projects
 
-* Includes dark mode
-* default favicon.ico
-* js import file and basic js imports
+This is the website made for learning pali from Bhante Sujato's Pali Course 2023
+
+Made in Yew (transpiled to WebAssembly)
 
 
-development setup:
+### Website features
+* dark mode
+
+
+### Development setup
 
 `cargo install yarn`
 
