@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use std::cell::Cell;
 use std::fmt::{Display, Formatter};
 

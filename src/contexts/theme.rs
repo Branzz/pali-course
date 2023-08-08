@@ -166,12 +166,13 @@ pub fn theme_switcher() -> Html {
                 border-radius: 50%;
                 background-position: center;
                 border: dashed lightslategray 0px;
-                background-image: url("assets/${i}.png");
+                background-image: url("/assets/${i}.png");
                 transition: all .25s ease-in-out;
                 transform: rotate(20deg);
                 color: transparent;
                 background-color: transparent;
                 position: absolute;
+                top: 0px;
                 right: 10px;
                 &:hover {
                     transform: rotate(-10deg);

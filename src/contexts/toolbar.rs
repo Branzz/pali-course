@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use std::borrow::BorrowMut;
 use std::ops::Deref;
 use std::rc::Rc;
@@ -9,9 +11,11 @@ use yew::Callback;
 use yew::context::ContextHandle;
 use yew::html::Scope;
 use yew::prelude::*;
+use yew_router::prelude::*;
 use yew::virtual_dom::VNode;
 
-use crate::{log, log_js, ProviderProps};
+use crate::app::Route;
+use crate::{log, log_js, ProviderProps, html_if_some};
 use crate::contexts::{RunState, ThemeContext, ThemeKind, ThemeSwitcher, use_theme};
 use crate::contexts::runner::{RunnerAction, RunStateType, StateAction};
 
@@ -40,18 +44,51 @@ impl Reducible for RunState {
     }
 }
 
+
+#[derive(Properties, PartialEq)]
+pub struct ToolbarProps {
+    pub name: Option<String>,
+    pub prev_path: Option<String>,
+    pub next_path: Option<String>,
+}
 pub static TOOLBAR_HEIGHT: &str = "40px";
 
 #[styled_component(Toolbar)]
-pub fn toolbar() -> Html {
+pub fn toolbar(props: &ToolbarProps) -> Html {
     let toolbar_context = use_context::<ToolbarContext>().unwrap();
     let theme_context: ThemeContext = use_theme();
     let theme = theme_context.kind();
     let background_color = theme_context.toolbar_background_color.clone();
 
-    let props1 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "1", state: RunStateType::A });
-    let props2 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "2", state: RunStateType::B });
-    let props3 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "3", state: RunStateType::C });
+    // let props1 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "1", state: RunStateType::A });
+    // let props2 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "2", state: RunStateType::B });
+    // let props3 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "3", state: RunStateType::C });
+
+    let top = html_if_some(props.name.clone(), |name| html! {
+                <div>
+                    { name }
+                </div>
+    });
+
+    let prev = html_if_some(props.prev_path.clone(), |prev| html! {
+                <div class={css!(r#"position: absolute; left: 30%; "#)}>
+                    <div class={"top-button"}>
+                        <Link<Route> to={Route::Lesson {path: prev}}>
+                            { "<" }
+                        </Link<Route>>
+                    </div>
+                </div>
+    });
+
+    let next = html_if_some(props.next_path.clone(), |next| html! {
+                <div class={css!(r#"position: absolute; right: 30%; "#)}>
+                    <div class={"top-button"}>
+                        <Link<Route> to={Route::Lesson {path: next}}>
+                            { ">" }
+                        </Link<Route>>
+                    </div>
+                </div>
+    });
 
     html! {
     <>
@@ -65,16 +102,37 @@ pub fn toolbar() -> Html {
         <div class={css!(
             r#"
             display: flex;
-            justify-content: space-between;
-            right: 50%;
-            position: absolute;
+            justify-content: center;
+            margin-top: 2px;
+            font-size: 24pt;
             "#
         )} >
-            <ToolbarButton ..props1/>
-            <ToolbarButton ..props2/>
-            <ToolbarButton ..props3/>
+            { prev }
+            { top }
+            { next }
+            <ThemeSwitcher />
         </div>
-        <ThemeSwitcher />
+      </div>
+    </>
+    }
+}
+
+#[styled_component(NamedToolbar)]
+pub fn named_toolbar() -> Html {
+    let toolbar_context = use_context::<ToolbarContext>().unwrap();
+    let theme_context: ThemeContext = use_theme();
+    let theme = theme_context.kind();
+    let background_color = theme_context.toolbar_background_color.clone();
+
+    html! {
+    <>
+      <div class={css!(
+            r#"
+            width: 100vw;
+            height: ${h};
+            background-color: ${bg_c};
+            "#, h = TOOLBAR_HEIGHT, bg_c = background_color,
+      )}>
       </div>
     </>
     }
@@ -119,8 +177,8 @@ impl Component for ToolbarButton {
         let callback: Callback<MouseEvent> = Callback::from(move |e: MouseEvent| {
             tb_ctx.dispatch( RunnerAction::new(StateAction::To(RunState { run_state: state })) );
         });
+        // use values from MouseEvent, like if it's a shift click, to do more actions
 
-        // use values from MouseEvent, like if it's a shift click, to do more actions (run code normally)
         html! {
           <>
             <button class={css!(
@@ -132,7 +190,7 @@ impl Component for ToolbarButton {
                  background-size: calc(5 * ${h} / 8);
                  background-repeat: no-repeat;
                  background-position: center;
-                 background-image: url("assets/toolbar_icons/${i}.png");
+                 background-image: url("/assets/toolbar_icons/${i}.png");
                  border: dashed lightslategray 0px;
                  border-radius: 2px;
                  transition: all .25s ease-in-out;

@@ -4,13 +4,15 @@
 #![feature(fn_traits)]
 #![feature(async_closure)]
 #![feature(fmt_internals)]
+#![feature(string_leak)]
+#![feature(pattern)]
 
 mod contexts;
 
 #[macro_use]
 mod app;
 use wasm_bindgen::prelude::*;
-use yew::Properties;
+use yew::{Properties, html, Html};
 
 use yew::Children;
 
@@ -37,7 +39,6 @@ extern "C" {
 
     #[wasm_bindgen(js_namespace = console, js_name = log)]
     fn log_js(v: JsValue);
-
 }
 
 #[wasm_bindgen(module = "/src/main.js")]
@@ -50,9 +51,22 @@ extern "C" {
 
     #[wasm_bindgen(js_name = sleep)]
     fn sleep(duration_milli: u32);
+
+    #[wasm_bindgen(js_name = get_lessons_json)]
+    fn get_lessons_json() -> JsValue;
 }
 
 #[derive(Debug, PartialEq, Properties)]
 pub(crate) struct ProviderProps {
     pub children: Children,
+}
+
+pub(crate) fn html_if_some<T, F>(element: Option<T>, html: F) -> Html
+    where T: Clone,
+          F: Fn(T) -> Html {
+    return match element.clone() {
+        None => html!(),
+        Some(val) => html.call((val.clone(),))
+    }
+
 }

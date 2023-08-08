@@ -3,14 +3,14 @@ import livereload from "rollup-plugin-livereload";
 import serve from "rollup-plugin-serve";
 import copy from 'rollup-plugin-copy';
 import resolve from '@rollup/plugin-node-resolve';
-import { wasm  } from '@rollup/plugin-wasm';
+// import { wasm  } from '@rollup/plugin-wasm';
 
 // TODO [no_mangle]
 const is_watch = !!process.env.ROLLUP_WATCH;
 
 export default {
     input: {
-        app: "./Cargo.toml",
+        app: "./Cargo.toml", // may not be necessary
         // index: "./src/main.js",
     },
     output: {
@@ -32,7 +32,7 @@ export default {
             // nodejs: true,
             // inlineWasm: false,
             // include: ["src/*", "static/*"],
-            watchPatterns: ["src/**", "static/**", "**.js", "**.toml"],
+            watchPatterns: ["src/**", "static/**", "**.js", "**.toml", "**.css"],
             inlineWasm: true,
             experimental: {
                     // directExports: true,
@@ -42,13 +42,15 @@ export default {
         }),
         copy({
             targets: [
-                { src: 'static/assets/', dest: 'dist/' },
-                { src: 'static/index.html', dest: 'dist/' },
+                // { src: 'static/assets/', dest: 'dist/' },
+                // { src: 'static/index.html', dest: 'dist/' },
+                { src: 'static/**', dest: 'dist/'}
                 // { src: 'static/main.js', dest: 'dist/static' },
             ]
         }),
         is_watch && serve({
             contentBase: "dist",
+            historyApiFallback: true,
             open: true,
         }),
         is_watch && livereload({
@@ -56,7 +58,6 @@ export default {
             verbose: false,
             // port: 8888,
             delay: 300,
-
         }),
 
     ],

@@ -1,0 +1,125 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    font-family: "Skolar Sutta Web", serif;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/*.top-button a:link, .top-button a:visited {*/
+/*    color: #BAF;*/
+/*    text-decoration: none;*/
+/*}*/
+
+a:link, a:visited {
+    color: #BAF;
+    text-decoration: none;
+}
+
+.centered, h1, h2, h3 {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+.spaced {
+    margin-bottom: 50px;
+}
+
+.top-button {
+    background-color: gray;
+    border: 1px black solid;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 20pt;
+}
+
+.stretched {
+    width: 100%;
+}
+
+.listed-info {
+    font-size: 30px;
+}
+
+.listed-info a {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.info {
+    margin: 25px 20% 25px 20%;
+}
+
+.flexer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.exercise-table {
+    border-collapse: collapse;
+    border: 1px solid;
+    display: inline-table;
+}
+
+table, th, td {
+    padding: 5px;
+    border: 1px solid;
+}
+
+.spoilable {
+    background-color: #223;
+}
+
+.spoilable:hover .spoiler,
+.spoilable:hover .spoiler::selection {
+    color: white;
+}
+
+.spoiler, .spoiler::selection {
+    color: #223;
+}
+
+.table-input {
+
+}
+
+.side-options {
+    width: fit-content;
+    height: fit-content;
+    display: inline-table;
+    margin-left: 10px;
+}
+
+select {
+    font-family: "Skolar Sutta Web", serif;
+    font-size: 20px;
+    background-color: #223;
+    color: white;
+    border: gray 1px solid;
+    border-radius: 3px;
+}
+
+.filler-left {
+    width: 50%;
+}
+
+.filler-center {
+}
+
+.filler-right {
+    width: 50%;
+}
