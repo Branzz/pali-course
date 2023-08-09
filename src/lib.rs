@@ -17,6 +17,7 @@ use yew::{Properties, html, Html};
 
 use yew::Children;
 use crate::app::empty_html;
+use std::fmt::{Display, Debug};
 
 #[no_mangle] // TODO
 #[wasm_bindgen(start)]
@@ -26,6 +27,16 @@ pub fn lib_main() {
 
 fn log_string(s: String) {
     log(s.as_str());
+}
+
+fn log_display<T: Display>(t: T) -> T {
+    log(format!("{}", t).as_str());
+    t
+}
+
+fn log_dbg<T: Debug>(t: T) -> T {
+    log(format!("{:?}", t).as_str());
+    t
 }
 
 #[wasm_bindgen]

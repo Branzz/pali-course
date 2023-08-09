@@ -12,8 +12,8 @@ use rand::seq::SliceRandom;
 use crate::contexts::toolbar::{TOOLBAR_HEIGHT};
 use crate::contexts::{RunnerProvider, ThemeKind, ThemeProvider, ThemeContext, ToolbarContext,
                       Toolbar, NamedToolbar, ExerciseComponent, ExerciseComponentProps,
-                      Lessons, Lesson, Exercise, Exercises, DataTable};
-use crate::{get_lessons_json, log};
+                      Lessons, Lesson, Exercise, Exercises};
+use crate::{get_lessons_json, log, log_display, log_dbg};
 use percent_encoding::percent_decode_str;
 use yew::{Html, html, Properties, Callback, use_state};
 use yew::prelude::*;
@@ -29,68 +29,23 @@ use crate::{html_if_some};
 use std::ops::Deref;
 use std::slice::Iter;
 use crate::app::empty_html;
-use crate::contexts::table::OptionsStyle::Undecided;
 use std::mem::discriminant;
 // use core::str::find;
 
-type Location = (usize, usize);
-type ParsedTable = Vec<Vec<ParsedCell>>;
+type DataTable = Vec<Vec<String>>;
 
-#[derive(PartialEq, Clone)]
-pub enum ParsedCell {
-    Label(String),
-    Interactive( (String, String, String) ),
-}
-
-#[derive(PartialEq, Clone, Deserialize)]
-pub enum ExerciseMode {
-    Show, // ABC
-    Censor, // [][][]
-    ClickReveal, // [] -> A
-    CensorByLetter, // A[][] -> AB[]
-    TypeField, // [Az ]
-    DropDown(OptionsStyle), // >ABC or >XYZ
-}
-
-impl FromStr for ExerciseMode {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "Show"           => Ok(ExerciseMode::Show),
-            "Censor"         => Ok(ExerciseMode::Censor),
-            "ClickReveal"    => Ok(ExerciseMode::ClickReveal),
-            "CensorByLetter" => Ok(ExerciseMode::CensorByLetter),
-            "TypeField"      => Ok(ExerciseMode::TypeField),
-            "DropDown"       => Ok(ExerciseMode::DropDown(OptionsStyle::Undecided)),
-            _ => Err(())
-        }
-    }
-}
-
-impl ToString for ExerciseMode {
-    fn to_string(&self) -> String {
-        match &self {
-            ExerciseMode::Show => "Show",
-            ExerciseMode::Censor => "Censor",
-            ExerciseMode::ClickReveal => "ClickReveal",
-            ExerciseMode::CensorByLetter => "CensorByLetter",
-            ExerciseMode::TypeField => "TypeField",
-            ExerciseMode::DropDown(_) => "DropDown",
-            _ => ""
-        }.to_string()
-    }
-}
-
-#[derive(Properties, PartialEq)]
-pub(crate) struct TableProps {
+#[derive(Properties, PartialEq, Clone, Deserialize)]
+pub struct TableProps {
+    // pub table: DataTable,
+    // pub initial_mode: ExerciseMode,
     pub table: DataTable,
-    pub initial_mode: ExerciseMode,
+    pub default_mode: Option<ExerciseMode>, // Default: Censor
+    pub options_style: Option<OptionsStyle>, // Default: All
 }
 
 #[derive(PartialEq, Clone, Deserialize)]
+#[serde(tag = "type", content = "options")]
 pub enum OptionsStyle {
-    Undecided, // TODO eliminate need for this
     Disabled,
     All(Option<Vec<String>>),
     ByCol(Option<Vec<Vec<String>>>),
@@ -104,8 +59,49 @@ impl FromStr for OptionsStyle {
             "Disabled" => Ok(OptionsStyle::Disabled),
             "All" =>      Ok(OptionsStyle::All(None)),
             "ByCol" =>    Ok(OptionsStyle::ByCol(None)),
-            _ => Err(())
+            _ =>          Ok(OptionsStyle::Disabled),
         }
+    }
+}
+
+type ParsedTable = Vec<Vec<ParsedCell>>;
+type Location = (usize, usize);
+
+trait DirectionalInclusive<T> {
+    fn left (&self, of: T) -> bool;
+    fn right(&self, of: T) -> bool;
+    fn above(&self, of: T) -> bool;
+    fn below(&self, of: T) -> bool;
+}
+
+impl DirectionalInclusive<&Location> for Location {
+    fn left (&self, of: &Location) -> bool {
+        self.1 < of.1
+    }
+    fn right(&self, of: &Location) -> bool {
+        self.1 > of.1
+    }
+    fn above(&self, of: &Location) -> bool {
+        self.0 < of.0
+    }
+    fn below(&self, of: &Location) -> bool {
+        self.0 > of.0
+    }
+}
+
+
+trait GetLocation<T> {
+    fn get_location(&self, location: &Location) -> Option<&T>;
+    fn get_location_unchecked(&self, location: &Location) -> &T;
+}
+
+impl<T> GetLocation<T> for Vec<Vec<T>> {
+    fn get_location(&self, location: &Location) -> Option<&T> {
+        self.get(location.0).map(|v| v.get(location.1)).flatten()
+    }
+
+    fn get_location_unchecked(&self, location: &Location) -> &T {
+        self.get(location.0).unwrap().get(location.1).unwrap()
     }
 }
 
@@ -114,7 +110,7 @@ pub(crate) struct Table {
     pub parsed_table: ParsedTable,
     pub location_table: Vec<Vec<Location>>,
     pub mode: ExerciseMode,
-    pub options: OptionsStyle,
+    pub options_style: OptionsStyle,
 }
 
 pub enum TableMsg {
@@ -127,12 +123,17 @@ impl Component for Table {
     type Properties = TableProps;
 
     fn create(ctx: &Context<Self>) -> Self {
+        // let mut initial_mode = ctx.props().default_mode.clone().map(|s| ExerciseMode::from_str(s.as_str()).unwrap_or(ExerciseMode::Censor)).unwrap_or(ExerciseMode::Censor);
+
+        let parsed_table = create_parsed_table(&ctx.props().table);
+        let location_table = create_location_table(&ctx.props().table);
+        let options_style = create_options_style(ctx.props().options_style.clone(), &parsed_table, &location_table);
         Self {
             table: ctx.props().table.clone(),
-            parsed_table: create_parsed_table(&ctx.props().table),
-            location_table: create_location_table(&ctx.props().table),
-            mode: ctx.props().initial_mode.clone(),
-            options: OptionsStyle::Disabled,
+            parsed_table,
+            location_table,
+            mode: ctx.props().default_mode.clone().unwrap_or(ExerciseMode::Censor),
+            options_style,
         }
     }
 
@@ -153,6 +154,7 @@ impl Component for Table {
         // let theme: ThemeContext = ctx.;
 
         // let mode_state = use_state(|| ctx.props().initial_mode);
+
 
         let mode_switcher = |e| //ctx.link().call(move |_|
             {
@@ -177,12 +179,16 @@ impl Component for Table {
         // })
 
         let (drop_down_option_html, extra_option_html) =
-            if self.mode == ExerciseMode::DropDown(OptionsStyle::Disabled) {
+            if self.options_style == OptionsStyle::Disabled {
                 (empty_html(),
                  empty_html())
             } else {
                 (html! { <option value="DropDown"> {"Drop down"} </option>},
-                 html! { <button class={"side-options"}>{"check"}</button>})
+                    match self.mode {
+                        ExerciseMode::DropDown => { html! { <button class={"side-options"}> {"check"} </button>} },  // TODO interaction
+                        _  => empty_html()
+                    }
+                )
             };
 
         return html! {
@@ -262,15 +268,14 @@ impl Table {
                             <td> { start } <input class={"table-input"} type="text" {onchange}/> { end } </td>
                         }) as Html
                     }
-                    ExerciseMode::DropDown(options_style) => {
+                    ExerciseMode::DropDown => {
                         let onchange = Callback::from(move |e| {
                             // log(&*format!("{}-{}-{}", start, middle, end));
                         });
-                        let options = match options_style {
-                            OptionsStyle::Undecided => vec![],
+                        let options = match self.options_style.clone() {
                             OptionsStyle::Disabled => vec![],
-                            OptionsStyle::All(options) => options.unwrap(),
-                            OptionsStyle::ByCol(col_options) => (*col_options.unwrap().get(location.1).unwrap()).clone(),
+                            OptionsStyle::All(options)=> options.unwrap(),
+                            OptionsStyle::ByCol(col_options)=> (*col_options.unwrap().get(location.1).unwrap()).clone(),
                         };
                         (html! {
                             <td> { start }
@@ -289,6 +294,121 @@ impl Table {
 
 }
 
+fn create_options_style(from_options_style_unpredicted: Option<OptionsStyle>, parsed_table: &ParsedTable, location_table: &Vec<Vec<Location>>) -> OptionsStyle {
+    let from_options_style: OptionsStyle = from_options_style_unpredicted.unwrap_or({ // predict the default based on the data
+        let top_left_opt: Option<&Location> = location_table.iter().flat_map(|v| v)
+            .find(|l: &&Location| parsed_table.get_location_unchecked(l).is_interactive());
+        if let Some(top_left) = top_left_opt {
+            let bottom_right: &Location = location_table.iter().flat_map(|v| v)
+                .rev()
+                .find(|l: &&Location| parsed_table.get_location_unchecked(l).is_interactive()).unwrap();
+
+            let extends_horizontally = top_left.1 == 0 && bottom_right.1 == parsed_table.get(bottom_right.0).unwrap().len() - 1;
+
+            log_display(extends_horizontally);
+            log_dbg(top_left);
+            log_dbg(bottom_right);
+            if extends_horizontally {
+                let forms_a_grid = log_dbg(location_table.iter().flat_map(|v| v).find(|loc: &&Location| {
+                    // let loc: Location = *loc_ref.clone();
+                    if parsed_table.get_location_unchecked(loc).is_interactive()
+                        { loc.left(top_left) || loc.above(top_left) || loc.right(bottom_right) || loc.below(bottom_right) }
+                    else
+                        { !loc.left(top_left) && !loc.above(top_left) && !loc.right(bottom_right) && !loc.below(bottom_right) }
+                })).is_none();
+
+                log_display(forms_a_grid);
+
+                if forms_a_grid {
+                    OptionsStyle::ByCol(None)
+                } else {
+                    OptionsStyle::All(None)
+                }
+            } else {
+                OptionsStyle::All(None)
+            }
+        } else {
+            OptionsStyle::Disabled // no cells are interactive
+        }
+    } as OptionsStyle);
+
+    match from_options_style {
+        OptionsStyle::Disabled => OptionsStyle::Disabled,
+        OptionsStyle::All(_) => {
+            let options = create_options(parsed_table.iter().flat_map(|row: &Vec<ParsedCell>| row).collect());
+            if options.len() > 1 { OptionsStyle::All(Some(options))} else { OptionsStyle::Disabled }
+        },
+        OptionsStyle::ByCol(_) => {
+            let cols = parsed_table.get(0).map(|row: &Vec<ParsedCell>| row.len()).unwrap_or(0 as usize);
+            let rotated_table = (0..cols)
+                .map(|i| parsed_table.iter()
+                    .map(|row: &Vec<ParsedCell>| row.get(i))
+                    .filter(Option::is_some)
+                    .map(Option::unwrap)
+                    .map(|cell: &ParsedCell| cell)
+                    .collect());
+
+            let options = rotated_table.map(|col: Vec<&ParsedCell>| create_options(col)).collect();
+            OptionsStyle::ByCol(Some(options))
+        }
+        _ => OptionsStyle::Disabled
+    }
+}
+
+#[derive(PartialEq, Clone)]
+pub enum ParsedCell {
+    Label(String),
+    Interactive( (String, String, String) ),
+}
+
+impl ParsedCell {
+    fn is_interactive(&self) -> bool {
+        match self {
+            ParsedCell::Interactive(_) => true,
+            _ => false
+        }
+    }
+}
+
+#[derive(PartialEq, Clone, Deserialize)]
+pub enum ExerciseMode {
+    Show, // ABC
+    Censor, // [][][]
+    ClickReveal, // [] -> A
+    CensorByLetter, // A[][] -> AB[]
+    TypeField, // [Az ]
+    DropDown, // >ABC or >XYZ
+}
+
+impl FromStr for ExerciseMode {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Show"           => Ok(ExerciseMode::Show),
+            "Censor"         => Ok(ExerciseMode::Censor),
+            "ClickReveal"    => Ok(ExerciseMode::ClickReveal),
+            "CensorByLetter" => Ok(ExerciseMode::CensorByLetter),
+            "TypeField"      => Ok(ExerciseMode::TypeField),
+            "DropDown"       => Ok(ExerciseMode::DropDown),
+            _ => Err(())
+        }
+    }
+}
+
+impl ToString for ExerciseMode {
+    fn to_string(&self) -> String {
+        match &self {
+            ExerciseMode::Show => "Show",
+            ExerciseMode::Censor => "Censor",
+            ExerciseMode::ClickReveal => "ClickReveal",
+            ExerciseMode::CensorByLetter => "CensorByLetter",
+            ExerciseMode::TypeField => "TypeField",
+            ExerciseMode::DropDown => "DropDown",
+            _ => ""
+        }.to_string()
+    }
+}
 
 fn create_parsed_table(table: &DataTable) -> ParsedTable {
     table.clone().iter()
@@ -324,28 +444,12 @@ fn split_bars(str: String) -> ParsedCell {
     return ParsedCell::Label(str);
 }
 
-fn create_options_style(parsed_table: &ParsedTable, options_style: OptionsStyle) -> OptionsStyle {
-    match options_style {
-        OptionsStyle::Disabled => OptionsStyle::Disabled,
-        OptionsStyle::All(_) => OptionsStyle::All(Some(create_options(parsed_table.iter().flat_map(|row: &Vec<ParsedCell>| row).collect()))),
-        OptionsStyle::ByCol(_) => {
-            let cols = parsed_table.get(0).map(|row: &Vec<ParsedCell>| row.len()).unwrap_or(0 as usize);
-            let rotated_table = (0..cols)
-                .map(|i| parsed_table.iter()
-                    .map(|row: &Vec<ParsedCell>| row.get(i).unwrap())
-                    .map(|cell: &ParsedCell| cell)
-                    .collect());
 
-            OptionsStyle::ByCol(Some(rotated_table.map(|col: Vec<&ParsedCell>| create_options(col)).collect()))
-        }
-        _ => OptionsStyle::Undecided
-    }
-}
 
 fn create_options(unfiltered_options: Vec<&ParsedCell>) -> Vec<String> {
     let mut rng = rand::thread_rng();
     let mut options: Vec<String> = unfiltered_options.iter()
-        .filter(|c: &&&ParsedCell| match c { ParsedCell::Interactive(_) => true, _ => false })
+        .filter(|c: &&&ParsedCell| c.is_interactive())
         .map(|c: &&ParsedCell| match c { ParsedCell::Interactive(split) => split.1.clone(), _ => unreachable!() } )
         .unique()
         .collect();

@@ -4,6 +4,7 @@
 * buttons to type non ascii
 * ctrl v detection
 * organize imports
+* \*styled text\* from json fromat
 * table...
     * disable drop down (in-case there's one answer and it just reveals it immediately)
     * exercise mode images
