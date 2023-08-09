@@ -18,7 +18,7 @@ type DataTable = Vec<Vec<String>>;
 #[derive(PartialEq, Clone, Deserialize)]
 pub struct Exercise {
     pub title: Option<String>,
-    pub link: Option<String>,
+    pub path: Option<String>, // how to refer to it in the url
     pub info: Option<String>,
     pub table: Option<DataTable>,
     pub default_mode: Option<String>,
@@ -44,6 +44,12 @@ impl Exercise {
             <ExerciseComponent exercise={self} />
         }
     }
+
+    pub fn effective_path(&self) -> String {
+        // .map(|mut t: String| {t.remove_matches(|c: char| c.is_whitespace()); t})
+        self.path.clone().or(self.title.clone()).unwrap_or("404".to_string())
+    }
+
 }
 
 // pub const EXERCISES: &[Exercise] = &[Exercise::new("abc", "Yatonidānaṁ, bhikkhu, purisaṁ papañcasaññāsaṅkhā samudācaranti. Ettha ce natthi abhinanditabbaṁ abhivaditabbaṁ ajjhositabbaṁ. Esevanto rāgānusayānaṁ, esevanto paṭighānusayānaṁ, esevanto diṭṭhānusayānaṁ, esevanto vicikicchānusayānaṁ, esevanto mānānusayānaṁ, esevanto bhavarāgānusayānaṁ, esevanto avijjānusayānaṁ, esevanto daṇḍādānasatthādānakalahaviggahavivādatuvaṁtuvaṁpesuññamusāvādānaṁ. Etthete pāpakā akusalā dhammā aparisesā nirujjhantī.",
@@ -79,6 +85,9 @@ pub(crate) fn exercise_component(props: &ExerciseComponentProps) -> Html {
                 </p>
             // </div>
     });
+
+    // https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/page/n{}/mode/1up
+    // page
 
     let table = if props.exercise.table.is_some() {
 

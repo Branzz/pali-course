@@ -6,6 +6,7 @@
 #![feature(fmt_internals)]
 #![feature(string_leak)]
 #![feature(pattern)]
+#![feature(string_remove_matches)]
 
 mod contexts;
 

@@ -28,3 +28,4 @@ yew-router = "0.17"
 rand = "0.8.5"
 getrandom = { version = "0.2", features = ["js"] }
 itertools = "0.11.0"
+percent-encoding = "2.3.0"

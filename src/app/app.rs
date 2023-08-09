@@ -13,8 +13,9 @@ use serde_wasm_bindgen::from_value;
 use crate::contexts::toolbar::{TOOLBAR_HEIGHT};
 use crate::contexts::{RunnerProvider, ThemeContext, ThemeKind, ThemeProvider, ToolbarContext,
                       Toolbar, NamedToolbar, use_theme, ExerciseComponent,  ExerciseComponentProps,
-                      ExerciseMode, Lessons, Lesson, Exercises};
+                      ExerciseMode, Lessons, Lesson, Exercise, Exercises};
 use crate::{get_lessons_json, log};
+use percent_encoding::percent_decode_str;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -30,14 +31,22 @@ pub enum Route {
     #[at("/pali/lessons")]
     Lessons,
 
-    #[at("/pali/lessons/:path")]
-    RedirectToLesson { path: String },
-
     #[at("/pali/lesson/:path")]
     Lesson { path: String },
 
+    #[at("/pali/lessons/:path")]
+    // #[at("/pali/exercises/:path")]
+    RedirectToLesson { path: String },
+
+    #[at("/pali/lesson/:path/exercise/404")]
+    // #[at("/pali/exercises/:path")]
+    RedirectToLesson2 { path: String },
+
     #[at("/pali/lesson/:lesson_path/exercise/:exercise_path")]
     Exercise { lesson_path: String, exercise_path: String },
+
+    // #[at("/pali/lessons/:exercise_path")]
+    // RedirectToExercise { path: String },
 
     #[not_found]
     #[at("/404")]
@@ -124,8 +133,8 @@ pub fn content_from_toolbar(toolbar: Html, main_content: Html) -> Html {
     return html! { <DefaultPage toolbar={toolbar} main_content={main_content} /> }
 }
 
-pub fn content_titled(title: String, main_content: Html) -> Html {
-    content_from_toolbar(html! { <Toolbar name={title} /> }, main_content)
+pub fn content_titled(title: String, return_route: Option<Route>, main_content: Html) -> Html {
+    content_from_toolbar(html! { <Toolbar name={title} return_route={return_route} /> }, main_content)
 }
 
 pub fn content_from(main_content: Html) -> Html {
@@ -137,26 +146,50 @@ fn switch(routes: Route) -> Html {
 
     match routes {
         Route::RedirectFromHome => html! { <Redirect<Route> to={Route::Overview} /> },
-        Route::Overview => content_titled(String::from("Overview"), html! {
+        Route::Overview => content_titled(String::from("Overview"), None, html! { <>
             <div class={"info"}>
                 // <h1>{ "a" }</h1>
                 <span>{"This is an interactive format from "}</span>
                 <a href="https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up">{"Introduction To Pali by A.K. Warder."}</a>
                 <h2> <Link<Route> to={Route::Lessons}>{ "View Lessons" }</Link<Route>> </h2>
-                <span>{"This may not necessarily be correct, so tell me any errors "}</span>
+                <span>{"This may not necessarily be correct, so please tell me any errors "}</span>
                 <a href="https://discourse.suttacentral.net/u/bran">{"here"}</a>
-                <span>{" or even any suggestions at all. Look through the tutorial and options."}</span>
+                <span>{r#" or even any suggestions at all.
+                            This is definitely a work-in-progress, so not every lesson is as full as I'd like.
+                            You can use this to memorize vocab, familiazize yourself, or quiz knowledge to track progression.
+                            You should firstly look through the tutorial and options."#}</span>
                 <h2> <Link<Route> to={Route::LearningResources}>{ "Other Resources" }</Link<Route>></h2>
                 <span>{"I'll keep this "}</span>
-                <a href="https://github.com/Branzz/pali-course">{"open source."}</a>
-                <span>{" If you'd like to contribute somehow, this was made in a lesson known framework, Yew (React-like) in Rust, transpiled to WebAssembly."}</span>
+                <a href="https://github.com/Branzz/pali-course">{"open source"}</a>
+                <span>{". If you'd like to contribute somehow, this was made in a lesson known framework, Yew (React-like) in Rust, transpiled to WebAssembly."}</span>
                 <br/>
-                <span>{"The lessons are stored in a simple "}</span>
-                <a href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L67">{"json"}</a>
-                <span>{", however, so it would be easy to add to that."}</span>
+                <span>{"The lessons are stored in an intuitive "}</span>
+                <a href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L67">{"json format"}</a>
+                <span>{", however, so it would be easy to add to that. You could also clone this and use the format for learning anything else."}</span>
+                <h2> { "Features" } </h2>
             </div>
-        }),
-        Route::LearningResources => content_titled(String::from("Resources"), html! { <>
+            <div class={"flex-surround"}>
+                <ul class={"boxxy"}>
+                    <h3> { "Completed" } </h3>
+                    <li> { "Framework for lesson creation" } </li>
+                    // <li> { "" } </li>
+                </ul>
+                <ul class={"boxxy"}>
+                    <h3> { "In-progress" } </h3>
+                    <li> { "Tutorial, Lessons 1-2" } </li>
+                    <li> { "Display modes" } </li>
+                    <li> { "Dark/Light theme" } </li>
+                    // <li> { "." } </li>
+                </ul>
+                <ul class={"boxxy"}>
+                    <h3> { "Planned / other ideas" } </h3>
+                    <li> { "Pāli letter paste buttons" } </li>
+                    <li> { "Lessons 3+" } </li>
+                    <li> { "Mobile friendly (mouse-hover, reactive)" } </li>
+                </ul>
+            </div>
+        </> }),
+        Route::LearningResources => content_titled(String::from("Resources"), Some(Route::Overview), html! { <>
             <div class={"info"}>
                 <p class={"spaced"}>{ "Some links I have compiled along with some things I have made" }</p>
                 <h3> <a href={ "https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up" }>{"Warder"}</a> </h3>
@@ -168,7 +201,7 @@ fn switch(routes: Route) -> Html {
             <div class={"centered"}> <img src="/sandhi.png"/> </div>
         </> }),
         Route::Lessons => {
-            content_titled(String::from("Lessons"), html! {
+            content_titled(String::from("Lessons"), Some(Route::Overview), html! {
                 <div class={"listed-info wide-text"}>
                     { for lessons.lessons.iter().map(|lesson| html! {
                         <Link<Route> to={Route::Lesson {path: lesson.path.clone()}}> { lesson.name.clone() } </Link<Route>>
@@ -176,21 +209,26 @@ fn switch(routes: Route) -> Html {
                 </div>
             })
         },
-        Route::RedirectToLesson { path } => html! { <Redirect<Route> to={Route::Lesson {path: path}} /> },
+        Route::RedirectToLesson  { path } => html! { <Redirect<Route> to={Route::Lesson {path: path}} /> },
+        Route::RedirectToLesson2 { path } => html! { <Redirect<Route> to={Route::Lesson {path: path}} /> },
         Route::Lesson { path } => {
             let lesson_position_opt = lessons.lessons.iter().position(|l: &Lesson| l.path == path);
             if lesson_position_opt.is_none() {
-                return content_from( html! { <h1> { "Unknown lesson" } </h1> } )
+                return content_from( html! { <> <h1> { "Unknown lesson" } </h1> <Link<Route> to={Route::Lessons}> {"Return"} </Link<Route>> </> } )
             }
             let lesson_position = lesson_position_opt.unwrap();
 
+            let return_route = Some(Route::Lessons);
             let prev_path = if lesson_position == 0 {None} else {lessons.lessons.get(lesson_position - 1).map(|l: &Lesson| l.path.clone())};
             let next_path = lessons.lessons.get(lesson_position + 1).map(|l: &Lesson| l.path.clone());
             let lesson: Lesson = lessons.lessons.remove(lesson_position);
 
+            let prev_route = prev_path.map(|path| Route::Lesson { path });
+            let next_route = next_path.map(|path| Route::Lesson { path });
+
             content_from_toolbar(
                 html! {
-                    <Toolbar name={lesson.name} prev_path={prev_path} next_path={next_path}/>
+                    <Toolbar name={lesson.name} return_route={return_route} prev_route={prev_route} next_route={next_route}/>
                 },
                 html! {
                     <Exercises exercises={lesson.exercises}/>
@@ -198,7 +236,67 @@ fn switch(routes: Route) -> Html {
             )
         },
         Route::Exercise {lesson_path, exercise_path} => {
-            html! {}
+            let lesson_position_opt = lessons.lessons.iter().position(|l: &Lesson| l.path == lesson_path);
+            if lesson_position_opt.is_none() {
+                return content_from( html! { <> <h1> { "Unknown lesson" } </h1> <Link<Route> to={Route::Lessons} /> </> } )
+            }
+            let lesson_position = lesson_position_opt.unwrap();
+
+            let mut lesson: Lesson = lessons.lessons.remove(lesson_position);
+            let lesson_path = lesson.path;
+
+            let decoded_exercise_path = percent_decode_str(exercise_path.as_str()).decode_utf8().unwrap();
+
+            log(&*decoded_exercise_path.clone());
+
+            let exercise_position_opt = lesson.exercises.iter().position(|e: &Exercise| e.effective_path() == decoded_exercise_path);
+            if exercise_position_opt.is_none() {
+                return content_from( html! { <> <h1> { "Unknown exercise" } </h1> <Link<Route> to={Route::Lesson {path: lesson_path.clone()}}> {"Return"} </Link<Route>> </> } )
+            }
+            let exercise_position = exercise_position_opt.unwrap();
+
+            let (prev_lesson_path, prev_exercise_path): (Option<String>, Option<String>) =
+                if exercise_position == 0 {
+                    if lesson_position == 0 {
+                        (None, None)
+                    } else {
+                        let l: Option<&Lesson> = lessons.lessons.get((lesson_position as i32 - 1) as usize);
+                        (l.map(|l: &Lesson| l.path.clone()), l.map(|l: &Lesson| l.exercises.last()).flatten().map(|e| e.effective_path().clone()))
+                    }
+                } else {
+                    (Some(lesson_path.clone()), lesson.exercises.get((exercise_position as i32 - 1) as usize).map(|e: &Exercise| e.effective_path().clone()))
+                };
+
+            let (next_lesson_path, next_exercise_path): (Option<String>, Option<String>) =
+                if exercise_position == lesson.exercises.len() - 1 {
+                    if lesson_position == lessons.lessons.len() - 1 {
+                        (None, None)
+                    } else {
+                        let l: Option<&Lesson> = lessons.lessons.get(lesson_position);
+                        (l.map(|l: &Lesson| l.path.clone()), l.map(|l: &Lesson| l.exercises.first()).flatten().map(|e| e.effective_path().clone()))
+                    }
+                } else {
+                    (Some(lesson_path.clone()), lesson.exercises.get(exercise_position + 1).map(|e: &Exercise| e.effective_path().clone()))
+                };
+
+
+            let return_route = Some(Route::Lesson { path: lesson_path });
+            let prev_route = prev_lesson_path.map(|lesson_path| prev_exercise_path.map(|exercise_path| {
+                Some(Route::Exercise { lesson_path, exercise_path })
+            }).unwrap_or(None)).unwrap_or(None);
+            let next_route = next_lesson_path.map(|lesson_path| next_exercise_path.map(|exercise_path| {
+                Some(Route::Exercise { lesson_path, exercise_path })
+            }).unwrap_or(None)).unwrap_or(None);
+            let exercise: Exercise = lesson.exercises.remove(exercise_position);
+
+            content_from_toolbar(
+                html! {
+                    <Toolbar name={lesson.name} return_route={return_route} prev_route={prev_route} next_route={next_route}/>
+                },
+                html! {
+                    <ExerciseComponent exercise={exercise}/>
+                }
+            )
         },
         Route::NotFound => content_from(html! {
             <h1>{ "404" }</h1>
@@ -215,98 +313,66 @@ fn routed() -> Html {
     }
 }
 
-// struct JsonLoader {
-//     json_string: UseStateHandle<String>,
-//     json_setter: Callback<String>,
+//                            eof                            //
+
+// #[styled_component(Comp)]
+// fn comp() -> Html {
+//     return html! {
+//       <>
+//         <div class={css!(
+//             r#"
+//             "#,
+//         )}>
+//             <SampleHOC/>
+//         </div>
+//       </>
+//     }
 // }
 //
-// impl JsonLoader {
+// // wrap users around Component
+// #[function_component]
+// pub fn SampleHOC() -> Html {
+//     let theme = use_theme().kind();
+//     let toolbar_context: ToolbarContext = use_context::<ToolbarContext>().unwrap();
+//     let state = toolbar_context.index().to_string();
 //
-//     pub fn new() -> Self {
-//         Self {
-//             json_string: use_state(|| String::new()),
-//             json_setter: Callback::from(move |str| json_string.set(str)),
+//     let props: SampleProps = props! {
+//         SampleProps{ theme: theme, tb_state: state }
+//     };
+//     html! {
+//         <Sample ..props />
+//     }
+// }
+//
+// #[derive(Properties, PartialEq)]
+// struct SampleProps {
+//     pub theme: ThemeKind,
+//     pub tb_state: String,
+// }
+//
+// struct Sample;
+//
+// struct SampleMsg;
+//
+// impl Component for Sample {
+//     type Message = SampleMsg;
+//     type Properties = SampleProps;
+//
+//     fn create(_ctx: &Context<Self>) -> Self {
+//         Self { }
+//     }
+//
+//     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+//         true
+//     }
+//
+//     fn view(&self, ctx: &Context<Self>) -> Html {
+//         let our_str = "font color: ".to_owned() + ctx.props().theme.clone().current().font_color.as_str()
+//                         + " | state: " + &ctx.props().tb_state;
+//
+//         html! {
+//            { our_str }
 //         }
 //     }
 //
-//     pub fn load_json(&self, ) {
-//         get_file("lessons.js".to_string());
-//         // let lessons_value: Value = serde_json::from_str(lessons_string.as_str())?;
-//         // log(&*format!("{}", lessons_value));
-//     }
-//
-//     pub fn set_json(&self, json: String) {
-//         // self.json_setter.
-//     }
-//
-//     pub fn get_json() -> String {}
 // }
-
-// #[styled_component(Content)]
-// pub fn content() -> Html {
-//     return html! {
-//         // <ExerciseComponent exercise={EXERCISES[0].clone()} mode={ExerciseMode::Show} />
-//     }
-// }
-
-#[styled_component(Comp)]
-fn comp() -> Html {
-    return html! {
-      <>
-        <div class={css!(
-            r#"
-            "#,
-        )}>
-            <SampleHOC/>
-        </div>
-      </>
-    }
-}
-
-// wrap users around Component
-#[function_component]
-pub fn SampleHOC() -> Html {
-    let theme = use_theme().kind();
-    let toolbar_context: ToolbarContext = use_context::<ToolbarContext>().unwrap();
-    let state = toolbar_context.index().to_string();
-
-    let props: SampleProps = props! {
-        SampleProps{ theme: theme, tb_state: state }
-    };
-    html! {
-        <Sample ..props />
-    }
-}
-
-#[derive(Properties, PartialEq)]
-struct SampleProps {
-    pub theme: ThemeKind,
-    pub tb_state: String,
-}
-
-struct Sample;
-
-struct SampleMsg;
-
-impl Component for Sample {
-    type Message = SampleMsg;
-    type Properties = SampleProps;
-
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self { }
-    }
-
-    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
-        true
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let our_str = "font color: ".to_owned() + ctx.props().theme.clone().current().font_color.as_str()
-                        + " | state: " + &ctx.props().tb_state;
-
-        html! {
-           { our_str }
-        }
-    }
-
-}

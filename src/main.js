@@ -1,29 +1,5 @@
 
-/*
-#151515
-#22221F
-#93A3B1
- */
-
-// console.log(lessons.js);
-
-function current_url() {
-}
-
-export function get_lessons_json() {
-    return lessons;
-    // if status, if ok etc...
-    // return await response.text()
-    // return "";
-
-    // .then(response => response.json())
-    // .then(json => console.log(json));
-    // var mydata = JSON.parse(window.lessons);
-
-}
-
-// https://yew.rs/docs/0.18.0/concepts/services/fetch
-// https://crates.io/crates/gloo-net
+// done in rust with gloo-net
 export function fetch_with_timeout(url, options, timeout = 15_000) {
     return Promise.race([
         fetch(url, options),
@@ -35,7 +11,7 @@ export async function sleep(duration) {
     await new Promise(r => setTimeout(r, duration));
 }
 
-export function call() { // you may also do this in rust side
+export function call() {
 
     var params = {
 
@@ -62,13 +38,26 @@ export function prefersDarkScheme() {
     return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
 }
 
+export function get_lessons_json() {
+    return lessons;
+}
 
+// store everything in one js file because of how it gets built
+/*
+ * view exercise.rs Exercise struct to see the form of each exercise;
+ * all parts are optional (to allow basic text in the middle of the page beyond exercises)
+ * the possible default-mode values are the titles of ExerciseMode (Show, Censor, CensorByLetter, TypeField, DropDown)
+ *
+ */
 const lessons = {
 "lessons": [
     {
         "name": "Tutorial",
         "path": "tutorial",
         "exercises": [
+            {
+                "title": "click ",
+            },
             {
                 "info": "Here's an exercise with the answers covered. Hover over them to reveal.",
                 "table": [
@@ -115,7 +104,7 @@ const lessons = {
         "exercises": [
             {
                 "title": "Conjugate Bhū",
-                "info": "The conjugations for a 1st conjugation verb.",
+                "info": "The conjugations for a 1st conjugation verb \"to be\"",
                 "table": [
                     ["person", "singular",  "plural"],
                     ["1st",    "bhav|āmi|", "bhav|āma|"],
@@ -123,7 +112,57 @@ const lessons = {
                     ["3rd",    "bhav|ati|", "bhav|anti|"],
                 ],
                 "default_mode": "Censor",
-            }
+            },
+            {
+                "title": "Verbs",
+                "info": "These belong to the first conjugation",
+                "table": [
+                    ["root", "verb", "meaning"],
+                    ["|kam|", "|upasaṁkamati|", "|he goes to, approaches|"],
+                    ["|kam|", "|pakkamati|", "|he goes away|"],
+                    ["|cu|", "|cavati|", "|he dies|"],
+                    ["|jīv|", "|jīvati|", "|he lives|"],
+                    ["|pass|", "|passati|", "|he sees|"],
+                    ["|pucch|", "|pucchati|", "|he asks|"],
+                    ["|bandh|", "|bandhati|", "|he binds|"],
+                    ["|bhās|", "|bhāsati|", "|he says, speaks|"],
+                    ["|bhū|", "|bhavati|", "|he is, there exists|"],
+                    ["|vad|", "|vadati|", "|he says|"],
+                    ["|sīd|", "|nisīdati|", "|he sits (down)|"],
+                    ["|har|", "|harati|", "|he takes|"],
+                    ["|har|", "|āharati|", "|he brings|"],
+                    ["|hū|", "|hoti|", "|he is, there is|"]
+                ],
+                "default_mode": "Censor",
+                "explanation": "",
+                "page": 11,
+            },
+            {
+                "title": "Nouns",
+                "info": "Masculine nouns in -a in the nominative singular.",
+                "table": [
+                    ["noun",        "meaning"],
+                    ["|upāsako|",   "|lay disciple|"],
+                    ["|kāyo|",      "|body, substance|"],
+                    ["|khattiyo|",  "|warrior, noble|"],
+                    ["|gāmo|",      "|village|"],
+                    ["|tathāgato|", "|thus-gone|"],
+                    ["|devo|",      "|god, king|"],
+                    ["|putto|",     "|son|"],
+                    ["|puriso|",    "|man, person|"],
+                    ["|brāhmaṅo|",  "|priest, brahman|"],
+                    ["|maggo|",     "|road, way|"],
+                    ["|manusso|",   "|human being, person|"],
+                    ["|amanusso|",  "|non-human being|"],
+                    ["|mahāmatto|", "|minister|"],
+                    ["|loko|",      "|world, people, universe|"],
+                    ["|samaṅo|",    "|ascetic, wanderer, philosopher|"],
+                    ["|samayo|",    "|time, occasion|"]
+                ],
+                "default_mode": "Censor",
+                "explanation": "",
+                "page": 13,
+            },
         ]
     },
     {

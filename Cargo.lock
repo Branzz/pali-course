@@ -1092,6 +1092,7 @@ dependencies = [
  "gloo-net",
  "itertools 0.11.0",
  "once_cell",
+ "percent-encoding",
  "rand",
  "serde",
  "serde-wasm-bindgen 0.4.5",

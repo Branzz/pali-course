@@ -48,8 +48,9 @@ impl Reducible for RunState {
 #[derive(Properties, PartialEq)]
 pub struct ToolbarProps {
     pub name: Option<String>,
-    pub prev_path: Option<String>,
-    pub next_path: Option<String>,
+    pub return_route: Option<Route>,
+    pub prev_route: Option<Route>,
+    pub next_route: Option<Route>,
 }
 pub static TOOLBAR_HEIGHT: &str = "40px";
 
@@ -64,31 +65,44 @@ pub fn toolbar(props: &ToolbarProps) -> Html {
     // let props2 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "2", state: RunStateType::B });
     // let props3 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "3", state: RunStateType::C });
 
-    let top = html_if_some(props.name.clone(), |name| html! {
-                <div>
-                    { name }
-                </div>
-    });
-
-    let prev = html_if_some(props.prev_path.clone(), |prev| html! {
-                <div class={css!(r#"position: absolute; left: 30%; "#)}>
+    let return_html = props.return_route.clone().map(|return_route| html! {
+                <div class={css!(r#" top: 0px; margin: 2px;
+                                     left: 10px; "#)}>
                     <div class={"top-button"}>
-                        <Link<Route> to={Route::Lesson {path: prev}}>
+                        <Link<Route> to={return_route}>
+                            { "↩" }
+                        </Link<Route>>
+                    </div>
+                </div>
+    }).unwrap_or(html! {<div> </div>} ); // hidden element to align flex parent
+
+    let prev = props.prev_route.clone().map(|prev| html! {
+                <div class={css!(r#" "#)}>
+                    <div class={"top-button"}>
+                        <Link<Route> to={prev}>
                             { "<" }
                         </Link<Route>>
                     </div>
                 </div>
-    });
+    }).unwrap_or(html! {<div> </div>} );
 
-    let next = html_if_some(props.next_path.clone(), |next| html! {
-                <div class={css!(r#"position: absolute; right: 30%; "#)}>
+    let top = props.name.clone().map(|name| html! {
+                <div class={css!(r#" width: 25%; text-align: center; "#)}>
+                    { name }
+                </div>
+    }).unwrap_or(html! {<div> </div>} );
+
+    let next = props.next_route.clone().map(|next| html! {
+                <div class={css!(r#" "#)}>
                     <div class={"top-button"}>
-                        <Link<Route> to={Route::Lesson {path: next}}>
+                        <Link<Route> to={next}>
                             { ">" }
                         </Link<Route>>
                     </div>
                 </div>
-    });
+        }
+    ).unwrap_or(html! {<div> </div>} );
+
 
     html! {
     <>
@@ -102,11 +116,11 @@ pub fn toolbar(props: &ToolbarProps) -> Html {
         <div class={css!(
             r#"
             display: flex;
-            justify-content: center;
-            margin-top: 2px;
+            justify-content: space-between;
             font-size: 24pt;
             "#
         )} >
+            { return_html }
             { prev }
             { top }
             { next }
