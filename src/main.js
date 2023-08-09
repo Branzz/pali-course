@@ -47,6 +47,8 @@ export function get_lessons_json() {
  * view exercise.rs Exercise struct to see the form of each exercise;
  * all parts are optional (to allow basic text in the middle of the page beyond exercises)
  * the possible default-mode values are the titles of ExerciseMode (Show, Censor, CensorByLetter, TypeField, DropDown)
+ * and similarly for OptionsStyle in table.rs (Disabled, All, ByCol)
+
  *
  */
 const lessons = {
@@ -160,6 +162,7 @@ const lessons = {
                     ["|samayo|",    "|time, occasion|"]
                 ],
                 "default_mode": "Censor",
+                "options_style": "",
                 "explanation": "",
                 "page": 13,
             },

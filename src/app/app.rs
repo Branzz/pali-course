@@ -313,7 +313,15 @@ fn routed() -> Html {
     }
 }
 
+pub fn empty_html() -> Html {
+    return html! {};
+}
+
+
+
 //                            eof                            //
+
+
 
 // #[styled_component(Comp)]
 // fn comp() -> Html {

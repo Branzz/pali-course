@@ -1,3 +1,3 @@
 mod app;
 
-pub(crate) use app::{main, Route};
+pub(crate) use app::{main, Route, empty_html};

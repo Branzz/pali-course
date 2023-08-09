@@ -16,6 +16,7 @@ use wasm_bindgen::prelude::*;
 use yew::{Properties, html, Html};
 
 use yew::Children;
+use crate::app::empty_html;
 
 #[no_mangle] // TODO
 #[wasm_bindgen(start)]
@@ -66,7 +67,7 @@ pub(crate) fn html_if_some<T, F>(element: Option<T>, html: F) -> Html
     where T: Clone,
           F: Fn(T) -> Html {
     return match element.clone() {
-        None => html!(),
+        None => empty_html(),
         Some(val) => html.call((val.clone(),))
     }
 

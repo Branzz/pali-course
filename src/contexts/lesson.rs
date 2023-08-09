@@ -7,7 +7,7 @@ use yew::prelude::*;
 use gloo_net::Error;
 use wasm_bindgen_futures::spawn_local;
 
-use crate::contexts::exercise::{Exercise, ExerciseMode, ExerciseComponent, ExerciseComponentProps};
+use crate::contexts::exercise::{Exercise,  ExerciseComponent, ExerciseComponentProps};
 
 // fn load_json() {
 //     let lessons = use_state(|| vec![]);

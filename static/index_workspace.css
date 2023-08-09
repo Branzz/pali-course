@@ -88,6 +88,23 @@ li {
     margin-left: 25px;
 }
 
+.table-area {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+.filler-left {
+    width: 50%;
+}
+
+.filler-center {
+}
+
+.filler-right {
+    width: 50%;
+}
+
 .exercise-table {
     border-collapse: collapse;
     border: 1px solid;
@@ -132,13 +149,7 @@ select {
     border-radius: 3px;
 }
 
-.filler-left {
-    width: 50%;
-}
-
-.filler-center {
-}
-
-.filler-right {
-    width: 50%;
+.ref {
+    font-size: 16pt;
+    display: none;
 }
