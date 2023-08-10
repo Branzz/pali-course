@@ -26,17 +26,21 @@ pub fn lib_main() {
 }
 
 fn log_string(s: String) {
-    log(s.as_str());
+    log_str(s.as_str());
 }
 
 fn log_display<T: Display>(t: T) -> T {
-    log(format!("{}", t).as_str());
+    log_str(format!("{}", t).as_str());
     t
 }
 
 fn log_dbg<T: Debug>(t: T) -> T {
-    log(format!("{:?}", t).as_str());
+    log_str(format!("{:?}", t).as_str());
     t
+}
+
+fn log_str(s: &str) {
+    log(s);
 }
 
 #[wasm_bindgen]

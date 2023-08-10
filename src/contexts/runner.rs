@@ -8,7 +8,7 @@ use wasm_bindgen::prelude::*;
 use yew::{Component, Context, Html, html, Properties, use_context, use_state, UseStateHandle};
 use yew::prelude::*;
 
-use crate::{log, ProviderProps, sleep};
+use crate::{log_str, ProviderProps, sleep};
 use crate::contexts::{Toolbar, ToolbarButton, ToolbarContext};
 
 type LoadingRunnerAction = Option<Callback<ToolbarContext>>;
@@ -78,11 +78,11 @@ impl RunState {
     // }
 
     pub fn update(&mut self, _toolbar_context: ToolbarContext) {
-        log("update");
+        log_str("update");
     }
 
     pub fn init(&self) {
-        log("init");
+        log_str("init");
     }
 
     pub(crate) fn state_act(&self, action: RunnerAction) -> RunState {

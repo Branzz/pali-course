@@ -46,7 +46,7 @@ export function get_lessons_json() {
 /*
  * view exercise.rs Exercise struct to see the form of each exercise;
  * all parts are optional (to allow basic text in the middle of the page beyond exercises)
- * the possible default-mode values are the titles of ExerciseMode (Show, Censor (default), CensorByLetter, TypeField, DropDown)
+ * the possible default-mode values are the titles of ExerciseMode (Show, HoverReveal, ClickReveal (default), CensorByLetter, TypeField, DropDown)
  * and similarly for  "options_style": { "type": "..." } , the options are in table.rs OptionsStyle. ("Disabled", "All", "ByCol").
  *  if none is given, it predicts what it should be. Users can't change it after initialization
  * This is designed to technically work with tables that aren't grid shaped - no guarantees
@@ -115,11 +115,12 @@ const lessons = {
                 "info": "The conjugations for a 1st conjugation verb \"to be\"",
                 "table_layout": {
                     "table": [
-                        ["person", "singular", "plural"],
-                        ["1st", "bhav|āmi|", "bhav|āma|"],
-                        ["2nd", "bhav|asi|", "bhav|atha|"],
-                        ["3rd", "bhav|ati|", "bhav|anti|"],
+                        ["person", "singular",  "plural"],
+                        ["1st",    "bhav|āmi|", "bhav|āma|"],
+                        ["2nd",    "bhav|asi|", "bhav|atha|"],
+                        ["3rd",    "bhav|ati|", "bhav|anti|"],
                     ],
+                    "default_mode": "HoverReveal",
                 }
             },
             {
@@ -127,23 +128,22 @@ const lessons = {
                 "info": "These belong to the first conjugation",
                 "table_layout": {
                     "table": [
-                        ["root", "verb", "meaning"],
-                        ["|kam|", "|upasaṁkamati|", "|he goes to, approaches|"],
-                        ["|kam|", "|pakkamati|", "|he goes away|"],
-                        ["|cu|", "|cavati|", "|he dies|"],
-                        ["|jīv|", "|jīvati|", "|he lives|"],
-                        ["|pass|", "|passati|", "|he sees|"],
-                        ["|pucch|", "|pucchati|", "|he asks|"],
-                        ["|bandh|", "|bandhati|", "|he binds|"],
-                        ["|bhās|", "|bhāsati|", "|he says, speaks|"],
-                        ["|bhū|", "|bhavati|", "|he is, there exists|"],
-                        ["|vad|", "|vadati|", "|he says|"],
-                        ["|sīd|", "|nisīdati|", "|he sits (down)|"],
-                        ["|har|", "|harati|", "|he takes|"],
-                        ["|har|", "|āharati|", "|he brings|"],
-                        ["|hū|", "|hoti|", "|he is, there is|"]
+                        ["root",    "verb",           "meaning"],
+                        ["|kam|",   "|upasaṁkamati|", "|he goes to, approaches|"],
+                        ["|kam|",   "|pakkamati|",    "|he goes away|"],
+                        ["|cu|",    "|cavati|",       "|he dies|"],
+                        ["|jīv|",   "|jīvati|",       "|he lives|"],
+                        ["|pass|",  "|passati|",      "|he sees|"],
+                        ["|pucch|", "|pucchati|",     "|he asks|"],
+                        ["|bandh|", "|bandhati|",     "|he binds|"],
+                        ["|bhās|",  "|bhāsati|",      "|he says, speaks|"],
+                        ["|bhū|",   "|bhavati|",      "|he is, there exists|"],
+                        ["|vad|",   "|vadati|",       "|he says|"],
+                        ["|sīd|",   "|nisīdati|",     "|he sits (down)|"],
+                        ["|har|",   "|harati|",       "|he takes|"],
+                        ["|har|",   "|āharati|",      "|he brings|"],
+                        ["|hū|",    "|hoti|",         "|he is, there is|"]
                     ],
-                    "default_mode": "DropDown",
                 },
                 "explanation": "",
                 "page": 11,
@@ -171,7 +171,6 @@ const lessons = {
                         ["|samaṅo|",    "|ascetic, wanderer, philosopher|"],
                         ["|samayo|",    "|time, occasion|"]
                     ],
-                    "default_mode": "DropDown",
                     // "options_style": { "ByCol": {} },
                 },
                 "explanation": "jqkbx",
@@ -184,7 +183,26 @@ const lessons = {
         "path": "2",
         "exercises": [
             {
-
+                "title": "Verbs",
+                "info": "These have irregular stems.",
+                "table_layout": {
+                    "table": [
+                        ["root",   "verb",      "meaning"],
+                        ["vis",    "pavisati",  "he enters"],
+                        ["phus",   "phusati",   "he touches, reaches, attains"],
+                        ["is",     "icchati",   "he wishes, desires"],
+                        ["gam",    "gacchati",  "he goes"],
+                        ["gam",    "āgacchati", "he comes"],
+                        ["(ṭ)ṭhā", "tiṭṭhati",  "he stands, remains, stays"],
+                        ["dā",     "deti",      "he gives"],
+                        ["hā",     "pajahati",  "he gives up, he renounces"],
+                        ["(v)vaj", "pabbajati", "he goes forth"],
+                        ["(j)jhe", "jhyāti",    "he meditates"],
+                        ["i",      "eti",       "he goes"],
+                    ],
+                },
+                "explanation": "Consonants will become \"assimilated\" with each other like s + ch -> cch",
+                "page": 16,
             }
         ]
     },

@@ -15,7 +15,7 @@ use yew_router::prelude::*;
 use yew::virtual_dom::VNode;
 
 use crate::app::Route;
-use crate::{log, log_js, ProviderProps, html_if_some};
+use crate::{log_str, log_js, ProviderProps, html_if_some};
 use crate::contexts::{RunState, ThemeContext, ThemeKind, ThemeSwitcher, use_theme};
 use crate::contexts::runner::{RunnerAction, RunStateType, StateAction};
 
@@ -66,8 +66,7 @@ pub fn toolbar(props: &ToolbarProps) -> Html {
     // let props3 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "3", state: RunStateType::C });
 
     let return_html = props.return_route.clone().map(|return_route| html! {
-                <div class={css!(r#" top: 0px; margin: 2px;
-                                     left: 10px; "#)}>
+                <div class={css!(r#" top: 0px; margin: 2px; left: 10px; "#)}>
                     <div class={"top-button"}>
                         <Link<Route> to={return_route}>
                             { "↩" }
@@ -189,9 +188,9 @@ impl Component for ToolbarButton {
         let color_str= format!("rgb({:?}, {:?}, {:?})", rgb[0], rgb[1], rgb[2]);
 
         let callback: Callback<MouseEvent> = Callback::from(move |e: MouseEvent| {
+            // use values from MouseEvent, like if it's a shift click, to do more actions
             tb_ctx.dispatch( RunnerAction::new(StateAction::To(RunState { run_state: state })) );
         });
-        // use values from MouseEvent, like if it's a shift click, to do more actions
 
         html! {
           <>

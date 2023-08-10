@@ -116,7 +116,7 @@ table, th, td {
     border: 1px solid;
 }
 
-.spoilable {
+.spoilable, .spoiler_button, .interactive {
     background-color: #223;
 }
 
@@ -127,6 +127,14 @@ table, th, td {
 
 .spoiler, .spoiler::selection {
     color: #223;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.visible {
+
 }
 
 .table-input {
@@ -147,6 +155,10 @@ select {
     color: white;
     border: gray 1px solid;
     border-radius: 3px;
+    padding-left: 2px;
+}
+
+option {
 }
 
 .ref {

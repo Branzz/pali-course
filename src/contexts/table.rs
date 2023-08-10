@@ -12,8 +12,8 @@ use rand::seq::SliceRandom;
 use crate::contexts::toolbar::{TOOLBAR_HEIGHT};
 use crate::contexts::{RunnerProvider, ThemeKind, ThemeProvider, ThemeContext, ToolbarContext,
                       Toolbar, NamedToolbar, ExerciseComponent, ExerciseComponentProps,
-                      Lessons, Lesson, Exercise, Exercises};
-use crate::{get_lessons_json, log, log_display, log_dbg};
+                      Lessons, Lesson, Exercise, Exercises, SpoilerCell};
+use crate::{get_lessons_json, log_str, log_display, log_dbg};
 use percent_encoding::percent_decode_str;
 use yew::{Html, html, Properties, Callback, use_state};
 use yew::prelude::*;
@@ -30,6 +30,7 @@ use std::ops::Deref;
 use std::slice::Iter;
 use crate::app::empty_html;
 use std::mem::discriminant;
+
 // use core::str::find;
 
 type DataTable = Vec<Vec<String>>;
@@ -106,16 +107,19 @@ impl<T> GetLocation<T> for Vec<Vec<T>> {
 }
 
 pub(crate) struct Table {
-    pub table: DataTable,
+    // pub table: DataTable,
     pub parsed_table: ParsedTable,
     pub location_table: Vec<Vec<Location>>,
     pub mode: ExerciseMode,
     pub options_style: OptionsStyle,
 }
 
+#[derive(Clone, Debug)]
 pub enum TableMsg {
     SwitchMode(ExerciseMode),
-    Clicked(Location),
+    CheckClicked,
+    CellClicked(Location),
+    Error,
 }
 
 impl Component for Table {
@@ -129,10 +133,10 @@ impl Component for Table {
         let location_table = create_location_table(&ctx.props().table);
         let options_style = create_options_style(ctx.props().options_style.clone(), &parsed_table, &location_table);
         Self {
-            table: ctx.props().table.clone(),
+            // table: ctx.props().table.clone(),
             parsed_table,
             location_table,
-            mode: ctx.props().default_mode.clone().unwrap_or(ExerciseMode::Censor),
+            mode: ctx.props().default_mode.clone().unwrap_or(ExerciseMode::ClickReveal),
             options_style,
         }
     }
@@ -143,11 +147,14 @@ impl Component for Table {
                 if self.mode == next_mode {
                     return false;
                 }
-                self.mode = next_mode
+                self.mode = next_mode;
+
+                true
             },
-            TableMsg::Clicked(_) => { return false; }
+            TableMsg::CheckClicked => { true },
+            TableMsg::CellClicked(_) => { false },
+            TableMsg::Error => { false },
         }
-        true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
@@ -155,22 +162,16 @@ impl Component for Table {
 
         // let mode_state = use_state(|| ctx.props().initial_mode);
 
+        let mode_switcher = ctx.link().callback(move |e: Event| {
+            let input: HtmlInputElement = e.target_unchecked_into();
+            ExerciseMode::from_str(input.value().as_str()).ok()
+                .map(TableMsg::SwitchMode)
+                .unwrap_or(TableMsg::Error)
+        });
 
-        let mode_switcher = |e| //ctx.link().call(move |_|
-            {
-        //     // let mode_str: Box<String> = Box::from(e.target_dyn_into::<HtmlInputElement>().expect("Unknown Event").value());
-        //     // mode_state.set(ExerciseMode::from_str(mode_str.deref().as_str()).expect("Unknown selection"));
-        //     log(event.value().as_str());
-        //     TableMsg::SwitchMode(ExerciseMode::Censor)
-        }
-       // )
-        ;
-
-        // let on_change1 = {
-        //
-        //     let m = mode_state.clone();
-        //     Callback::from(move |_| mode_state.set(*counter + 1))
-        // }
+        let check_answers = ctx.link().callback(move |e: MouseEvent| {
+            TableMsg::CheckClicked
+        });
 
         // let paste_detection = ctx.link().batch_callback(|event| {
         //     if event.key() = "C+V" {
@@ -178,35 +179,27 @@ impl Component for Table {
         //     }
         // })
 
-        let (drop_down_option_html, extra_option_html) =
-            if self.options_style == OptionsStyle::Disabled {
-                (empty_html(),
-                 empty_html())
-            } else {
-                (html! { <option value="DropDown"> {"Drop down"} </option>},
-                    match self.mode {
-                        ExerciseMode::DropDown => { html! { <button class={"side-options"}> {"check"} </button>} },  // TODO interaction
-                        _  => empty_html()
-                    }
-                )
-            };
-
         return html! {
             <div class={"table-area"}>
                 <div class={"filler-left"}>
                     // important lesson marker
                 </div>
-                <div class={"filler-center"}>{ self.html() } </div>
+                <div class={"filler-center"}>{ self.table_html(ctx) } </div>
                 <div class={"filler-right"}>
                     <select class={"side-options"} value={self.mode.to_string()} onchange={mode_switcher.clone()}>
-                        <option value="Show"> {"Reveal"} </option>
-                        <option value="Censor"> {"Cover"} </option>
+                        <option value="Show"> {"Reveal all"} </option>
+                        <option value="HoverReveal"> {"Hover reveal"} </option>
                         <option value="ClickReveal"> {"Click reveal"} </option>
                         <option value="CensorByLetter"> {"Reveal by letter"} </option>
                         <option value="TypeField"> {"Enter text"} </option>
-                        { drop_down_option_html }
+                        if self.options_style != OptionsStyle::Disabled {
+                           <option value="DropDown"> {"Drop down"} </option>
+                        }
                     </select>
-                    { extra_option_html }
+                    if self.options_style != OptionsStyle::Disabled
+                            && self.mode.has_input() {
+                        <button class={"side-options"} onclick={check_answers}> {"check"} </button> // TODO interaction
+                    }
                 </div>
             </div>
         }
@@ -216,14 +209,14 @@ impl Component for Table {
 
 impl Table {
 
-    fn html(&self) -> Html {
+    fn table_html(&self, ctx: &Context<Self>) -> Html {
         // let row_indices = (0..self.table.len());
         return html! { // 'return' is required for some weird macro reason
             <table class={"exercise-table"}> {
                 for self.location_table.iter().map(|row_locations| { html! {
                     <tr> {
                         for row_locations.iter().map(|location|
-                            self.mediated_cell(location)
+                            self.mediated_cell(location, ctx)
                         )
                     } </tr>
                 } })
@@ -231,60 +224,51 @@ impl Table {
         }
     }
 
-    fn mediated_cell(&self, location: &Location) -> Html {
+    fn mediated_cell(&self, location: &Location, ctx: &Context<Self>) -> Html {
         let cell: ParsedCell = (*self.parsed_table.get(location.0).unwrap().get(location.1).unwrap()).clone();
 
         match cell {
             ParsedCell::Label(val) => html! { <td> {val} </td> },
-            ParsedCell::Interactive(split) => {
-                let (start, middle, end) = split;
+            ParsedCell::Interactive(text) => {
+                // let (start, middle, end) = split;
 
                 return match self.mode.clone() {
                     ExerciseMode::Show => {
                         (html! {
-                            <td> { start } <strong> { middle } </strong> { end } </td>
+                            <td class={"interactive"}> { text.start }  { text.middle } { text.end } </td>
                         }) as Html
                     }
-                    ExerciseMode::Censor => {
-                        let onclick = Callback::from(move |_| {
-                            // log(&*format!("{}-{}-{}", start, middle, end));
-                        });
+                    ExerciseMode::HoverReveal => {
                         (html! {
-                            <td class={"spoilable"} {onclick}> { start } <span class={"spoiler"}> { middle } </span> { end } </td>
+                            <td class={"spoilable"}> { text.start } <span class={"spoiler"}> { text.middle } </span> { text.end } </td>
                         }) as Html
                     }
                     ExerciseMode::ClickReveal => {
-                        empty_html()
+                        (html! { <SpoilerCell text={text}/> }) as Html
                     }
                     ExerciseMode::CensorByLetter => {
                         empty_html()
                     }
                     ExerciseMode::TypeField => {
-                        let onchange = Callback::from(move |e| {
-                            // log(&*format!("{}-{}-{}", start, middle, end));
-                        });
                         // https://jsfiddle.net/drq0nz6j/
                         (html! {
-                            <td> { start } <input class={"table-input"} type="text" {onchange}/> { end } </td>
+                            <td> { text.start } <input class={"table-input"} type="text"/> { text.end } </td>
                         }) as Html
                     }
                     ExerciseMode::DropDown => {
-                        let onchange = Callback::from(move |e| {
-                            // log(&*format!("{}-{}-{}", start, middle, end));
-                        });
                         let options = match self.options_style.clone() {
-                            OptionsStyle::Disabled => vec![],
+                            OptionsStyle::Disabled => unreachable!("Accessed Dropdown when it was disabled"),
                             OptionsStyle::All(options)=> options.unwrap(),
                             OptionsStyle::ByCol(col_options)=> (*col_options.unwrap().get(location.1).unwrap()).clone(),
                         };
                         (html! {
-                            <td> { start }
-                                <select class={"table-input"} {onchange}>
+                            <td> { text.start }
+                                <select class={"table-input"}>
                                     { for options.iter().map(|o| { html! {
                                         <option value={o.clone()}>{o}</option>
                                     } }) }
                                 </select>
-                            { end } </td>
+                            { text.end } </td>
                         }) as Html
                     }
                 }
@@ -305,9 +289,6 @@ fn create_options_style(from_options_style_unpredicted: Option<OptionsStyle>, pa
 
             let extends_horizontally = top_left.1 == 0 && bottom_right.1 == parsed_table.get(bottom_right.0).unwrap().len() - 1;
 
-            log_display(extends_horizontally);
-            log_dbg(top_left);
-            log_dbg(bottom_right);
             if extends_horizontally {
                 let forms_a_grid = log_dbg(location_table.iter().flat_map(|v| v).find(|loc: &&Location| {
                     // let loc: Location = *loc_ref.clone();
@@ -316,8 +297,6 @@ fn create_options_style(from_options_style_unpredicted: Option<OptionsStyle>, pa
                     else
                         { !loc.left(top_left) && !loc.above(top_left) && !loc.right(bottom_right) && !loc.below(bottom_right) }
                 })).is_none();
-
-                log_display(forms_a_grid);
 
                 if forms_a_grid {
                     OptionsStyle::ByCol(None)
@@ -356,9 +335,22 @@ fn create_options_style(from_options_style_unpredicted: Option<OptionsStyle>, pa
 }
 
 #[derive(PartialEq, Clone)]
+pub struct TriSplit {
+    pub start: String,
+    pub middle: String,
+    pub end: String,
+}
+
+impl TriSplit {
+    pub fn new(start: String, middle: String, end: String) -> Self {
+        Self { start, middle, end }
+    }
+}
+
+#[derive(PartialEq, Clone)]
 pub enum ParsedCell {
     Label(String),
-    Interactive( (String, String, String) ),
+    Interactive(TriSplit),
 }
 
 impl ParsedCell {
@@ -370,14 +362,24 @@ impl ParsedCell {
     }
 }
 
-#[derive(PartialEq, Clone, Deserialize)]
+#[derive(PartialEq, Clone, Deserialize, Debug)]
 pub enum ExerciseMode {
     Show, // ABC
-    Censor, // [][][]
+    HoverReveal, // [][][]
     ClickReveal, // [] -> A
     CensorByLetter, // A[][] -> AB[]
     TypeField, // [Az ]
     DropDown, // >ABC or >XYZ
+}
+
+impl ExerciseMode {
+    fn has_input(&self) -> bool {
+        match self {
+            _ => false,
+            ExerciseMode::TypeField => true,
+            ExerciseMode::DropDown => true,
+        }
+    }
 }
 
 impl FromStr for ExerciseMode {
@@ -386,7 +388,7 @@ impl FromStr for ExerciseMode {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "Show"           => Ok(ExerciseMode::Show),
-            "Censor"         => Ok(ExerciseMode::Censor),
+            "HoverReveal"    => Ok(ExerciseMode::HoverReveal),
             "ClickReveal"    => Ok(ExerciseMode::ClickReveal),
             "CensorByLetter" => Ok(ExerciseMode::CensorByLetter),
             "TypeField"      => Ok(ExerciseMode::TypeField),
@@ -398,13 +400,13 @@ impl FromStr for ExerciseMode {
 
 impl ToString for ExerciseMode {
     fn to_string(&self) -> String {
-        match &self {
-            ExerciseMode::Show => "Show",
-            ExerciseMode::Censor => "Censor",
-            ExerciseMode::ClickReveal => "ClickReveal",
-            ExerciseMode::CensorByLetter => "CensorByLetter",
-            ExerciseMode::TypeField => "TypeField",
-            ExerciseMode::DropDown => "DropDown",
+        match self {
+        ExerciseMode::Show =>           "Show",
+        ExerciseMode::HoverReveal =>    "HoverReveal",
+        ExerciseMode::ClickReveal =>    "ClickReveal",
+        ExerciseMode::CensorByLetter => "CensorByLetter",
+        ExerciseMode::TypeField =>      "TypeField",
+        ExerciseMode::DropDown =>       "DropDown",
             _ => ""
         }.to_string()
     }
@@ -438,19 +440,17 @@ fn split_bars(str: String) -> ParsedCell {
         if right.is_some() {
             let (middle, end) = middle.split_at(right.unwrap());
             let (_, end) = end.split_at(1);
-            return ParsedCell::Interactive( (start.to_string(), middle.to_string(), end.to_string()) );
+            return ParsedCell::Interactive(TriSplit::new(start.to_string(), middle.to_string(), end.to_string()));
         }
     }
     return ParsedCell::Label(str);
 }
 
-
-
 fn create_options(unfiltered_options: Vec<&ParsedCell>) -> Vec<String> {
     let mut rng = rand::thread_rng();
     let mut options: Vec<String> = unfiltered_options.iter()
         .filter(|c: &&&ParsedCell| c.is_interactive())
-        .map(|c: &&ParsedCell| match c { ParsedCell::Interactive(split) => split.1.clone(), _ => unreachable!() } )
+        .map(|c: &&ParsedCell| match c { ParsedCell::Interactive(text) => text.middle.clone(), _ => unreachable!() } )
         .unique()
         .collect();
     options.shuffle(&mut rng);

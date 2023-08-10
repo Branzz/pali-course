@@ -14,7 +14,7 @@ use crate::contexts::toolbar::{TOOLBAR_HEIGHT};
 use crate::contexts::{RunnerProvider, ThemeContext, ThemeKind, ThemeProvider, ToolbarContext,
                       Toolbar, NamedToolbar, use_theme, ExerciseComponent,  ExerciseComponentProps,
                       ExerciseMode, Lessons, Lesson, Exercise, Exercises};
-use crate::{get_lessons_json, log};
+use crate::{get_lessons_json, log_str};
 use percent_encoding::percent_decode_str;
 
 #[derive(Clone, Routable, PartialEq)]
@@ -158,14 +158,16 @@ fn switch(routes: Route) -> Html {
                             This is definitely a work-in-progress, so not every lesson is as full as I'd like.
                             You can use this to memorize vocab, familiazize yourself, or quiz knowledge to track progression.
                             You should firstly look through the tutorial and options."#}</span>
-                <h2> <Link<Route> to={Route::LearningResources}>{ "Other Resources" }</Link<Route>></h2>
+                <h3> <Link<Route> to={Route::LearningResources}>{ "Other Resources" }</Link<Route>></h3>
                 <span>{"I'll keep this "}</span>
                 <a href="https://github.com/Branzz/pali-course">{"open source"}</a>
                 <span>{". If you'd like to contribute somehow, this was made in a lesson known framework, Yew (React-like) in Rust, transpiled to WebAssembly."}</span>
                 <br/>
+                <br/>
                 <span>{"The lessons are stored in an intuitive "}</span>
                 <a href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L67">{"json format"}</a>
-                <span>{", however, so it would be easy to add to that. You could also clone this and use the format for learning anything else."}</span>
+                <span>{", however, so it would be easy to add to that. Most of this isn't hard-coded, so one could clone this and easily use the format for learning anything else."}</span>
+                <br/>
                 <h2> { "Features" } </h2>
             </div>
             <div class={"flex-surround"}>
@@ -197,8 +199,8 @@ fn switch(routes: Route) -> Html {
                 <h3> <a href={ "https://www.digitalpalireader.online/_dprhtml/index.html" }>{"Digital Pali Reader"}</a> </h3>
                 <h3 class={"spaced"}> <a href={ "https://www.clearmountainmonastery.org/2020/08/01/article-a-fun-way-to-memorize-long-dhamma-with-a-special-focus-on-the-dhammapada/" }>{"Memorizing"}</a> </h3>
             </div>
-            <div class={"centered"}> <img src="/phoen.png"/> </div>
-            <div class={"centered"}> <img src="/sandhi.png"/> </div>
+            <div class={"centered"}> <img src="/phoen.png" /> </div>
+            <div class={"centered"}> <img src="/sandhi.png" /> </div>
         </> }),
         Route::Lessons => {
             content_titled(String::from("Lessons"), Some(Route::Overview), html! {
@@ -247,11 +249,11 @@ fn switch(routes: Route) -> Html {
 
             let decoded_exercise_path = percent_decode_str(exercise_path.as_str()).decode_utf8().unwrap();
 
-            log(&*decoded_exercise_path.clone());
+            log_str(&*decoded_exercise_path.clone());
 
             let exercise_position_opt = lesson.exercises.iter().position(|e: &Exercise| e.effective_path() == decoded_exercise_path);
             if exercise_position_opt.is_none() {
-                return content_from( html! { <> <h1> { "Unknown exercise" } </h1> <Link<Route> to={Route::Lesson {path: lesson_path.clone()}}> {"Return"} </Link<Route>> </> } )
+                return content_from( html! { <> <h1> { "Unknown exercise" } </h1> <Link<Route> to={Route::Lesson {path: lesson_path.clone()}}> { "Return" } </Link<Route>> </> } )
             }
             let exercise_position = exercise_position_opt.unwrap();
 
@@ -353,14 +355,14 @@ pub fn empty_html() -> Html {
 // }
 //
 // #[derive(Properties, PartialEq)]
-// struct SampleProps {
+// pub struct SampleProps {
 //     pub theme: ThemeKind,
 //     pub tb_state: String,
 // }
 //
-// struct Sample;
+// pub struct Sample;
 //
-// struct SampleMsg;
+// pub struct SampleMsg;
 //
 // impl Component for Sample {
 //     type Message = SampleMsg;

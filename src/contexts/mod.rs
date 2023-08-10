@@ -5,7 +5,8 @@ pub(crate) use toolbar::{RunnerProvider, Toolbar, NamedToolbar, ToolbarContext, 
 pub(crate) use runner::RunState;
 pub(crate) use exercise::{ExerciseComponent, Exercise, ExerciseComponentProps};
 pub(crate) use lesson::{Lessons, Lesson, Exercises};
-pub(crate) use table::{ExerciseMode, Table, TableProps};
+pub(crate) use table::{ExerciseMode, Table, TableProps, TriSplit};
+pub(crate) use button::{SpoilerCell, SpoilerCellProps};
 
 mod theme;
 pub(crate) mod toolbar;
@@ -13,3 +14,4 @@ pub mod runner;
 mod lesson;
 mod exercise;
 mod table;
+mod button;

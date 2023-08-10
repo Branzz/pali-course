@@ -10,7 +10,7 @@ use itertools::{Unique, Itertools};
 
 use crate::contexts::{ThemeContext, use_theme};
 use std::str::pattern::{Pattern, Searcher, SearchStep};
-use crate::{log, html_if_some, log_display};
+use crate::{log_str, html_if_some, log_display};
 use std::ops::Deref;
 use crate::contexts::table::{ExerciseMode};
 use crate::app::empty_html;
@@ -44,7 +44,7 @@ impl Exercise {
 
 #[derive(Properties, PartialEq)]
 pub struct ExerciseComponentProps {
-    pub exercise: Exercise,
+    pub exercise: Exercise, // TODO flatten to just Exercise ?
 }
 
 #[styled_component(ExerciseComponent)]
