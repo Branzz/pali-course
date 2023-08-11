@@ -6,12 +6,10 @@
 * organize imports
 * \*styled text\* from json fromat
 * table...
-    * disable drop down (in-case there's one answer and it just reveals it immediately)
     * exercise mode images
-    * drop down options from limited to column/row (with option to)
     * reveal entire col/row
-    * store table in component
     * important lesson marker (exercise::~207)
+* skip over title-less exercises
 
 /#151515
 /#22221F

@@ -31,6 +31,15 @@ a:link, a:visited {
     text-align: center;
 }
 
+p::first-line {
+    text-align: center;
+}
+
+p {
+    text-align: center;
+    text-align-last: left;
+}
+
 .spaced {
     margin-bottom: 50px;
 }
@@ -139,6 +148,14 @@ table, th, td {
 
 .table-input {
 
+}
+
+.correct_cell {
+    background-color: lightgreen;
+}
+
+.incorrect_cell {
+    background-color: lightcoral;
 }
 
 .side-options {

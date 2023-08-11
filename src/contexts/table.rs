@@ -12,7 +12,7 @@ use rand::seq::SliceRandom;
 use crate::contexts::toolbar::{TOOLBAR_HEIGHT};
 use crate::contexts::{RunnerProvider, ThemeKind, ThemeProvider, ThemeContext, ToolbarContext,
                       Toolbar, NamedToolbar, ExerciseComponent, ExerciseComponentProps,
-                      Lessons, Lesson, Exercise, Exercises, SpoilerCell};
+                      Lessons, Lesson, Exercise, Exercises, SpoilerCell, DropDownCell, DEFAULT_SELECTION_STRING};
 use crate::{get_lessons_json, log_str, log_display, log_dbg};
 use percent_encoding::percent_decode_str;
 use yew::{Html, html, Properties, Callback, use_state};
@@ -30,8 +30,7 @@ use std::ops::Deref;
 use std::slice::Iter;
 use crate::app::empty_html;
 use std::mem::discriminant;
-
-// use core::str::find;
+use std::collections::HashSet;
 
 type DataTable = Vec<Vec<String>>;
 
@@ -40,33 +39,59 @@ pub struct TableProps {
     // pub table: DataTable,
     // pub initial_mode: ExerciseMode,
     pub table: DataTable,
+    pub key_col: Option<usize>, // Show when rows unordered
     pub default_mode: Option<ExerciseMode>, // Default: Censor
-    pub options_style: Option<OptionsStyle>, // Default: All
+    pub options_style_type: Option<OptionsStyleType>,
 }
 
 #[derive(PartialEq, Clone, Deserialize)]
 #[serde(tag = "type", content = "options")]
-pub enum OptionsStyle {
+/// for DropDown mode
+pub enum OptionsStyleType {
     Disabled,
-    All(Option<Vec<String>>),
-    ByCol(Option<Vec<Vec<String>>>),
+    All,
+    ByCol,
 }
 
-impl FromStr for OptionsStyle {
+pub enum CheckedCellState {
+    Unchecked, // no css change
+    Correct,
+    Incorrect,
+}
+
+pub type CheckTable = Vec<Vec<CheckedCellState>>;
+
+#[derive(PartialEq, Clone, Deserialize)]
+#[serde(tag = "type", content = "options")]
+/// for DropDown mode
+pub enum OptionsStyle {
+    Disabled,
+    All { options: Vec<String> },
+    ByCol { col_options: Vec<Vec<String>> },
+}
+
+pub type InputTable = Vec<Vec<String>>;
+
+pub struct InputTracking {
+    pub input_table: InputTable,
+    pub check_table: bool,
+}
+
+impl FromStr for OptionsStyleType {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "Disabled" => Ok(OptionsStyle::Disabled),
-            "All" =>      Ok(OptionsStyle::All(None)),
-            "ByCol" =>    Ok(OptionsStyle::ByCol(None)),
-            _ =>          Ok(OptionsStyle::Disabled),
+            "Disabled" => Ok(OptionsStyleType::Disabled),
+            "All" =>      Ok(OptionsStyleType::All),
+            "ByCol" =>    Ok(OptionsStyleType::ByCol),
+            _ =>          Err(()),
         }
     }
 }
 
 type ParsedTable = Vec<Vec<ParsedCell>>;
-type Location = (usize, usize);
+pub(crate) type Location = (usize, usize);
 
 trait DirectionalInclusive<T> {
     fn left (&self, of: T) -> bool;
@@ -90,6 +115,9 @@ impl DirectionalInclusive<&Location> for Location {
     }
 }
 
+trait SetLocation<T> {
+    fn set_location_unchecked(&mut self, location: &Location, value: &T);
+}
 
 trait GetLocation<T> {
     fn get_location(&self, location: &Location) -> Option<&T>;
@@ -106,10 +134,18 @@ impl<T> GetLocation<T> for Vec<Vec<T>> {
     }
 }
 
+impl<T> SetLocation<T> for Vec<Vec<T>> {
+    fn set_location_unchecked(&mut self, location: &Location, value: &T) {
+        let mut row: &Vec<T> = self.get(location.0).as_mut().unwrap();
+        std::mem::replace(&mut &row[location.1], value);
+    }
+}
+
 pub(crate) struct Table {
     // pub table: DataTable,
     pub parsed_table: ParsedTable,
     pub location_table: Vec<Vec<Location>>,
+    pub input_tracking: Option<InputTracking>,
     pub mode: ExerciseMode,
     pub options_style: OptionsStyle,
 }
@@ -119,6 +155,7 @@ pub enum TableMsg {
     SwitchMode(ExerciseMode),
     CheckClicked,
     CellClicked(Location),
+    InputUpdate(Location, String),
     Error,
 }
 
@@ -131,13 +168,15 @@ impl Component for Table {
 
         let parsed_table = create_parsed_table(&ctx.props().table);
         let location_table = create_location_table(&ctx.props().table);
-        let options_style = create_options_style(ctx.props().options_style.clone(), &parsed_table, &location_table);
+        let options_summary = create_options_style(ctx.props().options_style_type.clone(), &parsed_table, &location_table);
+
         Self {
             // table: ctx.props().table.clone(),
             parsed_table,
             location_table,
+            input_tracking: options_summary.1.map(|input_table| InputTracking { input_table, check_table: false } ),
             mode: ctx.props().default_mode.clone().unwrap_or(ExerciseMode::ClickReveal),
-            options_style,
+            options_style: options_summary.0,
         }
     }
 
@@ -151,7 +190,60 @@ impl Component for Table {
 
                 true
             },
-            TableMsg::CheckClicked => { true },
+            TableMsg::CheckClicked => {
+                match &self.input_tracking {
+                    None => unreachable!("clicked check with no input tracking"),
+                    Some(input_tracking) => {
+                        // input_tracking.check_table {
+                        //     None => { // fill check data and redraw
+                                // match &self.options_style {
+                                //     OptionsStyle::All { .. } | OptionsStyle::ByCol { .. } => {
+                                //         let new_check_table: CheckTable = self.location_table.iter().map(|row: &Vec<Location>| row.iter().map(|loc: &Location| {
+                                //             let cell = self.parsed_table.get_location_unchecked(loc);
+                                //             if let ParsedCell::Interactive(split) = cell {
+                                //                 let user_input = input_tracking.input_table.get_location_unchecked(loc);
+                                //                 if user_input == &split.middle {
+                                //                     CheckedCellState::Correct
+                                //                 } else if user_input.is_empty() {
+                                //                     CheckedCellState::Unchecked
+                                //                 } else {
+                                //                     CheckedCellState::Incorrect
+                                //                 }
+                                //             } else {
+                                //                 CheckedCellState::Unchecked
+                                //             }
+                                //         }).collect()).collect();
+                                //
+                                //         self.input_tracking.as_mut().unwrap().check_table.replace(new_check_table);
+                                //     }
+                                //     OptionsStyle::Disabled => unreachable!("check on disabled down down options")
+                                // }
+                            // }
+                            // Some(_) => { // clicked check again or changed some input cell
+                                self.input_tracking.as_mut().unwrap().check_table =
+                                    !self.input_tracking.as_mut().unwrap().check_table;
+                            // }
+                        // }
+                    }
+                };
+
+                true
+            },
+            TableMsg::InputUpdate(location, value) => {
+                match &self.input_tracking {
+                    None => unreachable!("updated cell without input tracking"),
+                    Some(_) => {
+                        self.input_tracking.as_mut().unwrap().input_table.set_location_unchecked(&location, &value);
+                        // match input_tracking.check_table {
+                        //     None => (),
+                        //     Some(_) => {
+                        //         self.input_tracking.as_mut().unwrap().check_table.take();
+                        //     }
+                        // }
+                        true
+                    }
+                }
+            },
             TableMsg::CellClicked(_) => { false },
             TableMsg::Error => { false },
         }
@@ -186,20 +278,15 @@ impl Component for Table {
                 </div>
                 <div class={"filler-center"}>{ self.table_html(ctx) } </div>
                 <div class={"filler-right"}>
-                    <select class={"side-options"} value={self.mode.to_string()} onchange={mode_switcher.clone()}>
-                        <option value="Show"> {"Reveal all"} </option>
-                        <option value="HoverReveal"> {"Hover reveal"} </option>
-                        <option value="ClickReveal"> {"Click reveal"} </option>
-                        <option value="CensorByLetter"> {"Reveal by letter"} </option>
-                        <option value="TypeField"> {"Enter text"} </option>
-                        if self.options_style != OptionsStyle::Disabled {
-                           <option value="DropDown"> {"Drop down"} </option>
-                        }
+                    <select class={"side-options"} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
+                        <option value="Show"           selected={"Show" == self.mode.to_string().clone()}>            {"Reveal all"} </option>
+                        <option value="HoverReveal"    selected={"HoverReveal" == self.mode.to_string().clone()}>     {"Hover reveal"} </option>
+                        <option value="ClickReveal"    selected={"ClickReveal" == self.mode.to_string().clone()}>     {"Click reveal"} </option>
+                     // <option value="CensorByLetter" selected={"CensorByLetter" == self.mode.to_string().clone()}>  {"Reveal by letter"} </option>
+                        <option value="TypeField"      selected={"TypeField" == self.mode.to_string().clone()}>       {"Enter text"} </option>
+                        <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()} disabled={self.options_style == OptionsStyle::Disabled}> {"Drop down"} </option>
                     </select>
-                    if self.options_style != OptionsStyle::Disabled
-                            && self.mode.has_input() {
-                        <button class={"side-options"} onclick={check_answers}> {"check"} </button> // TODO interaction
-                    }
+                        <button class={"side-options"} onclick={check_answers}> {"check"} </button>
                 </div>
             </div>
         }
@@ -233,53 +320,37 @@ impl Table {
                 // let (start, middle, end) = split;
 
                 return match self.mode.clone() {
-                    ExerciseMode::Show => {
-                        (html! {
-                            <td class={"interactive"}> { text.start }  { text.middle } { text.end } </td>
-                        }) as Html
-                    }
-                    ExerciseMode::HoverReveal => {
-                        (html! {
-                            <td class={"spoilable"}> { text.start } <span class={"spoiler"}> { text.middle } </span> { text.end } </td>
-                        }) as Html
-                    }
-                    ExerciseMode::ClickReveal => {
-                        (html! { <SpoilerCell text={text}/> }) as Html
-                    }
-                    ExerciseMode::CensorByLetter => {
-                        empty_html()
-                    }
+                    ExerciseMode::Show => html! { <td class={"interactive"}> { text.start }  { text.middle } { text.end } </td> },
+                    ExerciseMode::HoverReveal => html! { <td class={"spoilable"}> { text.start } <span class={"spoiler"}> { text.middle } </span> { text.end } </td> },
+                    ExerciseMode::ClickReveal => html! { <SpoilerCell text={text}/> },
+                    ExerciseMode::CensorByLetter => { empty_html() }
                     ExerciseMode::TypeField => {
-                        // https://jsfiddle.net/drq0nz6j/
-                        (html! {
-                            <td> { text.start } <input class={"table-input"} type="text"/> { text.end } </td>
-                        }) as Html
+                        html! { // TODO lengthen fields when typed into - https://jsfiddle.net/drq0nz6j/
+                            <td class={""}> { text.start } <input class={"table-input"} type="text"/> { text.end } </td>
+                        }
                     }
                     ExerciseMode::DropDown => {
                         let options = match self.options_style.clone() {
-                            OptionsStyle::Disabled => unreachable!("Accessed Dropdown when it was disabled"),
-                            OptionsStyle::All(options)=> options.unwrap(),
-                            OptionsStyle::ByCol(col_options)=> (*col_options.unwrap().get(location.1).unwrap()).clone(),
+                            OptionsStyle::Disabled => unreachable!("Accessed drop down when it was disabled"),
+                            OptionsStyle::All { options } => options.clone(),
+                            OptionsStyle::ByCol { col_options } => col_options.get(location.1).unwrap().clone(),
                         };
-                        (html! {
-                            <td> { text.start }
-                                <select class={"table-input"}>
-                                    { for options.iter().map(|o| { html! {
-                                        <option value={o.clone()}>{o}</option>
-                                    } }) }
-                                </select>
-                            { text.end } </td>
-                        }) as Html
+
+                        let check_mode = self.input_tracking.as_ref().unwrap().check_table;
+                        log_display(check_mode);
+
+                        html! { <DropDownCell text={text.clone()} location={location.clone()} options={options} check_mode={check_mode}/> }
                     }
                 }
             }
         }
     }
 
+
 }
 
-fn create_options_style(from_options_style_unpredicted: Option<OptionsStyle>, parsed_table: &ParsedTable, location_table: &Vec<Vec<Location>>) -> OptionsStyle {
-    let from_options_style: OptionsStyle = from_options_style_unpredicted.unwrap_or({ // predict the default based on the data
+fn create_options_style(options_style_type: Option<OptionsStyleType>, parsed_table: &ParsedTable, location_table: &Vec<Vec<Location>>) -> (OptionsStyle, Option<InputTable>) {
+    let options_style_type_predicted: OptionsStyleType = options_style_type.unwrap_or({ // predict the default based on the data
         let top_left_opt: Option<&Location> = location_table.iter().flat_map(|v| v)
             .find(|l: &&Location| parsed_table.get_location_unchecked(l).is_interactive());
         if let Some(top_left) = top_left_opt {
@@ -299,38 +370,49 @@ fn create_options_style(from_options_style_unpredicted: Option<OptionsStyle>, pa
                 })).is_none();
 
                 if forms_a_grid {
-                    OptionsStyle::ByCol(None)
+                    OptionsStyleType::ByCol
                 } else {
-                    OptionsStyle::All(None)
+                    OptionsStyleType::All
                 }
             } else {
-                OptionsStyle::All(None)
+                OptionsStyleType::All
             }
         } else {
-            OptionsStyle::Disabled // no cells are interactive
+            OptionsStyleType::Disabled // no cells are interactive
         }
-    } as OptionsStyle);
+    });
 
-    match from_options_style {
-        OptionsStyle::Disabled => OptionsStyle::Disabled,
-        OptionsStyle::All(_) => {
+    match options_style_type_predicted {
+        OptionsStyleType::Disabled => (OptionsStyle::Disabled, None),
+        OptionsStyleType::All => {
             let options = create_options(parsed_table.iter().flat_map(|row: &Vec<ParsedCell>| row).collect());
-            if options.len() > 1 { OptionsStyle::All(Some(options))} else { OptionsStyle::Disabled }
-        },
-        OptionsStyle::ByCol(_) => {
-            let cols = parsed_table.get(0).map(|row: &Vec<ParsedCell>| row.len()).unwrap_or(0 as usize);
-            let rotated_table = (0..cols)
-                .map(|i| parsed_table.iter()
-                    .map(|row: &Vec<ParsedCell>| row.get(i))
-                    .filter(Option::is_some)
-                    .map(Option::unwrap)
-                    .map(|cell: &ParsedCell| cell)
-                    .collect());
 
-            let options = rotated_table.map(|col: Vec<&ParsedCell>| create_options(col)).collect();
-            OptionsStyle::ByCol(Some(options))
+            // let selected_option = options.first().map(|s: &String| s.clone().to_owned()).unwrap_or(String::new());
+            // let input_table = (0..parsed_table.len()).map(|r: usize| (0..parsed_table.get(r).unwrap().len()).map(|_| selected_option.clone()).collect()).collect();
+            let initial_input_table = (0..parsed_table.len()).map(|r: usize| (0..parsed_table.get(r).unwrap().len()).map(|_| DEFAULT_SELECTION_STRING.clone()).collect()).collect();
+
+            (if options.len() > 1 { OptionsStyle::All { options } } else { OptionsStyle::Disabled },
+                Some(initial_input_table)
+            )
+        },
+        OptionsStyleType::ByCol => {
+            let max_columns = parsed_table.iter().map(|row| row.len()).max().unwrap_or(0);
+            let mut col_options: Vec<Vec<&ParsedCell>> = vec![Vec::new(); max_columns];
+
+            for row in parsed_table {
+                for (col_index, cell) in row.iter().enumerate() {
+                    col_options[col_index].push(cell);
+                }
+            }
+
+            let col_options: Vec<Vec<String>> = col_options.iter().map(|col| create_options(col.iter().copied().collect())).collect();
+
+            // let selected_row_option: Vec<String> = col_options.iter().map(|v: &Vec<String>| v.first().map(|s: &String| s.clone().to_owned()).unwrap()).collect();
+            // let input_table = (0..parsed_table.len()).map(|r: usize| (0..parsed_table.get(r).unwrap().len()).map(|c: usize| selected_row_option.get(c).unwrap().clone()).collect()).collect();
+
+            let initial_input_table = (0..parsed_table.len()).map(|r: usize| (0..parsed_table.get(r).unwrap().len()).map(|_| DEFAULT_SELECTION_STRING.clone()).collect()).collect();
+            (OptionsStyle::ByCol { col_options }, Some(initial_input_table))
         }
-        _ => OptionsStyle::Disabled
     }
 }
 
