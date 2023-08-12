@@ -1,13 +1,12 @@
-use stylist::yew::{Global, styled_component};
-use yew::{Html, html, Component, Context};
-use gloo_net::http::{Request, Response};
-
-use serde::{Serialize, Deserialize};
-use yew::prelude::*;
 use gloo_net::Error;
+use gloo_net::http::{Request, Response};
+use serde::{Deserialize, Serialize};
+use stylist::yew::{Global, styled_component};
 use wasm_bindgen_futures::spawn_local;
+use yew::{Component, Context, Html, html};
+use yew::prelude::*;
 
-use crate::contexts::exercise::{Exercise,  ExerciseComponent, ExerciseComponentProps};
+use crate::contexts::exercise::{Exercise, ExerciseComponent, ExerciseComponentProps};
 
 // fn load_json() {
 //     let lessons = use_state(|| vec![]);

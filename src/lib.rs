@@ -8,16 +8,18 @@
 #![feature(pattern)]
 #![feature(string_remove_matches)]
 
+use std::fmt::{Debug, Display};
+
+use wasm_bindgen::prelude::*;
+use yew::{Html, Properties};
+use yew::Children;
+
+use crate::app::empty_html;
+
 mod contexts;
 
 #[macro_use]
 mod app;
-use wasm_bindgen::prelude::*;
-use yew::{Properties, html, Html};
-
-use yew::Children;
-use crate::app::empty_html;
-use std::fmt::{Display, Debug};
 
 #[no_mangle] // TODO
 #[wasm_bindgen(start)]

@@ -1,9 +1,11 @@
-use yew::{Context, Component, Html, html, Properties};
-use crate::contexts::table::{Location, InputTracking};
-use crate::contexts::TriSplit;
-use crate::{log, log_display};
+use web_sys::{HtmlInputElement, MouseEvent};
+use yew::{Component, Context, Html, html, Properties};
 use yew::prelude::*;
-use web_sys::{MouseEvent, HtmlInputElement};
+
+use crate::{log, log_display};
+use crate::contexts::table::{InputTracking, Location};
+use crate::contexts::TriSplit;
+use std::collections::HashMap;
 
 #[derive(Properties, PartialEq)]
 pub struct SpoilerCellProps {
@@ -12,9 +14,6 @@ pub struct SpoilerCellProps {
 
 pub struct SpoilerCell {
     spoiled: bool,
-}
-
-impl SpoilerCell {
 }
 
 pub enum SpoilerCellMsg {
@@ -40,7 +39,7 @@ impl Component for SpoilerCell {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let onclick = ctx.link().callback(move |e: MouseEvent| {
+        let onclick = ctx.link().callback(move |_e: MouseEvent| {
             SpoilerCellMsg::FlipState
         });
 
@@ -76,10 +75,9 @@ impl Component for DropDownCell {
     type Message = DropDownCellMsg;
     type Properties = InteractiveCellProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self {
             selected: DEFAULT_SELECTION_STRING,
-            // correct_selection: ctx.props().text.middle.clone(),
         }
     }
 
@@ -92,17 +90,16 @@ impl Component for DropDownCell {
     fn view(&self, ctx: &Context<Self>) -> Html {
 
         let text = ctx.props().text.clone();
-        // let check_enabled = self.input_tracking.as_ref().map(|it: &InputTracking| it.check_table.is_some()).is_some();
 
         let dropdown_changed = ctx.link().callback(move |e: Event| {
-            log_display("drop changed");
             let input: HtmlInputElement = e.target_unchecked_into();
             DropDownCellMsg::Update(input.value())
         });
 
         let checked_class =
             if ctx.props().check_mode && (self.selected != DEFAULT_SELECTION_STRING) {
-                if self.selected == ctx.props().text.middle.clone() {
+                if self.selected == ctx.props().text.middle.clone()
+                    || iso_shorthand_equals(&self.selected, &ctx.props().text.middle.clone()) {
                     "correct_cell"
                 } else {
                     "incorrect_cell"
@@ -127,6 +124,24 @@ impl Component for DropDownCell {
 
 }
 
-impl DropDownCell {
+// match the description in main.js
+const ISO_MAP: [(&str, &str); 10] = [
+    ("aa", "ā"),
+    ("ii", "ī"),
+    ("uu", "ū"),
+    (".t", "ṭ"),
+    (".d", "ḍ"),
+    ("`n", "ṅ"),
+    ("~n", "ñ"),
+    (".n", "ṇ"),
+    (".m", "ṃ"),
+    (".l", "ḷ"),
+];
 
+fn iso_shorthand_equals(shorthand: &String, iso: &String) -> bool {
+    let mut converted = shorthand.clone();
+    for (from, to) in &ISO_MAP {
+        converted = converted.replace(from, to.clone());
+    }
+    return &converted == iso;
 }

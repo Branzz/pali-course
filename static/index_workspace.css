@@ -7,10 +7,10 @@ html, body {
     font-family: "Skolar Sutta Web", serif;
     padding: 0;
     margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    /*display: flex;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    /*flex-direction: column;*/
     overflow: hidden;
 }
 
@@ -45,14 +45,16 @@ p {
 }
 
 .top-button {
-    background-color: gray;
-    border: 1px black solid;
+    background-color: #ba8620;
+    border: 1px #664400 solid;
     border-radius: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
     font-size: 20pt;
-    top: 3px;
+    margin-top: 3px;
+    height: 32px;
+    width: 32px;
+    text-align: center;
     position: relative;
+    color: #ffd1ab;
 }
 
 .stretched {
@@ -83,6 +85,8 @@ p {
 .flex-surround {
     display: flex;
     justify-content: space-around;
+    margin-left: 25px;
+    margin-right: 25px;
 }
 
 .boxxy {
@@ -100,7 +104,7 @@ li {
 .table-area {
     display: flex;
     justify-content: center;
-    margin-bottom: 50px;
+    margin-bottom: 15px;
 }
 
 .filler-left {
@@ -121,12 +125,12 @@ li {
 }
 
 table, th, td {
-    padding: 5px;
+    padding: 4px 6px;
     border: 1px solid;
 }
 
 .spoilable, .spoiler_button, .interactive {
-    background-color: #223;
+    background-color: #241820;
 }
 
 .spoilable:hover .spoiler,
@@ -135,7 +139,7 @@ table, th, td {
 }
 
 .spoiler, .spoiler::selection {
-    color: #223;
+    color: #241820;
 }
 
 .invisible {
@@ -165,20 +169,33 @@ table, th, td {
     margin-left: 10px;
 }
 
-select {
+select, .table-input {
     font-family: "Skolar Sutta Web", serif;
     font-size: 20px;
-    background-color: #223;
+    background-color: #241820;
     color: white;
     border: gray 1px solid;
     border-radius: 3px;
     padding-left: 2px;
 }
 
+.check {
+    font-family: "Skolar Sutta Web", serif;
+    font-size: 16px;
+    background-color: #241820;
+    color: white;
+    border: gray 1px solid;
+    margin-left: 10px;
+    border-radius: 3px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 1px;
+}
+
 option {
 }
 
 .ref {
-    font-size: 16pt;
-    display: none;
+    font-size: 14pt;
+    display: block;
 }

@@ -6,8 +6,8 @@ use stylist::yew::styled_component;
 use yew::html::ImplicitClone;
 use yew::prelude::*;
 use yew::virtual_dom::VChild;
+
 use crate::{prefers_dark_scheme, ProviderProps};
-// use strum_macros::EnumIter; // 0.17.1 TODO
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum ThemeKind {
@@ -34,7 +34,7 @@ impl ThemeKind {
             font_color: "white".to_string(),
             content_background_color: "#101014".to_string(),
             default_background_color: "#151515".to_string(),
-            toolbar_background_color: "rgb(80, 90, 100)".to_string(),
+            toolbar_background_color: "rgb(150, 90, 20)".to_string(),
             icon_background_color: "#24F".to_string(),
             other_background_color: "rgb(50, 50, 50)".to_string(),
             hover_color: "#AAA".to_string(),
@@ -145,7 +145,6 @@ pub fn theme_switcher() -> Html {
 
     let icon_name = theme.icon_name.clone();
     let background_color = theme.icon_background_color.clone();
-    // TODO??? let rotate = if theme.kind().clone() == ThemeKind::Dark {"20".to_string()} else {"0".to_string()};
 
     let theme_vec: Vec<ThemeKind> = ThemeKind::elements_vec();
     let theme_ind: usize = theme_vec.iter().position(|t| t == &theme.kind()).unwrap();
@@ -153,14 +152,12 @@ pub fn theme_switcher() -> Html {
         ThemeKind::elements_vec().remove((theme_ind + 1) % theme_vec.len())
     ));
 
-    // TODO transition: color .2s ease-in-out, box-shadow .3s ease-in-out, rotate;
-    // , r = rotate
     html! {
-        <div>
+        <div class={css!( r#" display: inline; "#)}>
             <button class={css!(
              r#"
-                height: 40px;
-                width: 40px;
+                height: 30px;
+                width: 30px;
                 background-size: 30px;
                 background-repeat: no-repeat;
                 border-radius: 50%;
@@ -171,9 +168,10 @@ pub fn theme_switcher() -> Html {
                 transform: rotate(20deg);
                 color: transparent;
                 background-color: transparent;
-                position: absolute;
-                top: 0px;
+                top: -20px;
                 right: 10px;
+                vertical-align: middle;
+                margin-right: 5px;
                 &:hover {
                     transform: rotate(-10deg);
                     background-color: ${bg_c};

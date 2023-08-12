@@ -1,36 +1,34 @@
+use std::collections::HashSet;
+use std::mem::discriminant;
+use std::ops::Deref;
 use std::panic;
+use std::slice::Iter;
+use std::str::FromStr;
+use std::str::pattern::{Pattern, Searcher, SearchStep};
 
-use stylist::yew::{ styled_component};
+use gloo_net::http::Request;
+use itertools::{Itertools, Unique};
+use percent_encoding::percent_decode_str;
+use rand::seq::SliceRandom;
+use serde::{Deserialize, Serialize};
+use serde_wasm_bindgen::from_value;
+use stylist::yew::styled_component;
+use wasm_bindgen::JsValue;
+use web_sys::{EventTarget, HtmlInputElement};
+use yew::{Callback, Html, html, Properties, use_state};
+use yew::prelude::*;
 use yew::prelude::*;
 use yew::props;
-use gloo_net::http::Request;
 use yew_router::prelude::*;
-use wasm_bindgen::JsValue;
-use serde_wasm_bindgen::from_value;
-use rand::seq::SliceRandom;
 
-use crate::contexts::toolbar::{TOOLBAR_HEIGHT};
-use crate::contexts::{RunnerProvider, ThemeKind, ThemeProvider, ThemeContext, ToolbarContext,
-                      Toolbar, NamedToolbar, ExerciseComponent, ExerciseComponentProps,
-                      Lessons, Lesson, Exercise, Exercises, SpoilerCell, DropDownCell, DEFAULT_SELECTION_STRING};
-use crate::{get_lessons_json, log_str, log_display, log_dbg};
-use percent_encoding::percent_decode_str;
-use yew::{Html, html, Properties, Callback, use_state};
-use yew::prelude::*;
-// use yew::html::onchange::Event;
-use std::str::FromStr;
-use web_sys::{EventTarget, HtmlInputElement};
-use serde::{Serialize, Deserialize};
-use itertools::{Unique, Itertools};
-
-use crate::contexts::{use_theme};
-use std::str::pattern::{Pattern, Searcher, SearchStep};
-use crate::{html_if_some};
-use std::ops::Deref;
-use std::slice::Iter;
+use crate::{get_lessons_json, log_dbg, log_display, log_str};
 use crate::app::empty_html;
-use std::mem::discriminant;
-use std::collections::HashSet;
+use crate::contexts::{DEFAULT_SELECTION_STRING, DropDownCell, Exercise, ExerciseComponent, ExerciseComponentProps,
+                      Exercises, Lesson, Lessons, NamedToolbar,
+                      RunnerProvider, SpoilerCell, ThemeContext, ThemeKind, ThemeProvider, Toolbar, ToolbarContext};
+use crate::contexts::toolbar::TOOLBAR_HEIGHT;
+use crate::contexts::use_theme;
+use crate::html_if_some;
 
 type DataTable = Vec<Vec<String>>;
 
@@ -40,8 +38,9 @@ pub struct TableProps {
     // pub initial_mode: ExerciseMode,
     pub table: DataTable,
     pub key_col: Option<usize>, // Show when rows unordered
+    pub shuffle_rows: Option<bool>,
     pub default_mode: Option<ExerciseMode>, // Default: Censor
-    pub options_style_type: Option<OptionsStyleType>,
+    pub options_style_type: Option<OptionsStyleType>, // predicted
 }
 
 #[derive(PartialEq, Clone, Deserialize)]
@@ -52,14 +51,6 @@ pub enum OptionsStyleType {
     All,
     ByCol,
 }
-
-pub enum CheckedCellState {
-    Unchecked, // no css change
-    Correct,
-    Incorrect,
-}
-
-pub type CheckTable = Vec<Vec<CheckedCellState>>;
 
 #[derive(PartialEq, Clone, Deserialize)]
 #[serde(tag = "type", content = "options")]
@@ -136,8 +127,8 @@ impl<T> GetLocation<T> for Vec<Vec<T>> {
 
 impl<T> SetLocation<T> for Vec<Vec<T>> {
     fn set_location_unchecked(&mut self, location: &Location, value: &T) {
-        let mut row: &Vec<T> = self.get(location.0).as_mut().unwrap();
-        std::mem::replace(&mut &row[location.1], value);
+        let row: &Vec<T> = self.get(location.0).as_mut().unwrap();
+        let _ = std::mem::replace(&mut &row[location.1], value);
     }
 }
 
@@ -187,46 +178,16 @@ impl Component for Table {
                     return false;
                 }
                 self.mode = next_mode;
-
                 true
             },
             TableMsg::CheckClicked => {
                 match &self.input_tracking {
                     None => unreachable!("clicked check with no input tracking"),
-                    Some(input_tracking) => {
-                        // input_tracking.check_table {
-                        //     None => { // fill check data and redraw
-                                // match &self.options_style {
-                                //     OptionsStyle::All { .. } | OptionsStyle::ByCol { .. } => {
-                                //         let new_check_table: CheckTable = self.location_table.iter().map(|row: &Vec<Location>| row.iter().map(|loc: &Location| {
-                                //             let cell = self.parsed_table.get_location_unchecked(loc);
-                                //             if let ParsedCell::Interactive(split) = cell {
-                                //                 let user_input = input_tracking.input_table.get_location_unchecked(loc);
-                                //                 if user_input == &split.middle {
-                                //                     CheckedCellState::Correct
-                                //                 } else if user_input.is_empty() {
-                                //                     CheckedCellState::Unchecked
-                                //                 } else {
-                                //                     CheckedCellState::Incorrect
-                                //                 }
-                                //             } else {
-                                //                 CheckedCellState::Unchecked
-                                //             }
-                                //         }).collect()).collect();
-                                //
-                                //         self.input_tracking.as_mut().unwrap().check_table.replace(new_check_table);
-                                //     }
-                                //     OptionsStyle::Disabled => unreachable!("check on disabled down down options")
-                                // }
-                            // }
-                            // Some(_) => { // clicked check again or changed some input cell
-                                self.input_tracking.as_mut().unwrap().check_table =
-                                    !self.input_tracking.as_mut().unwrap().check_table;
-                            // }
-                        // }
+                    Some(_) => {
+                        self.input_tracking.as_mut().unwrap().check_table =
+                            !self.input_tracking.as_mut().unwrap().check_table;
                     }
                 };
-
                 true
             },
             TableMsg::InputUpdate(location, value) => {
@@ -234,12 +195,6 @@ impl Component for Table {
                     None => unreachable!("updated cell without input tracking"),
                     Some(_) => {
                         self.input_tracking.as_mut().unwrap().input_table.set_location_unchecked(&location, &value);
-                        // match input_tracking.check_table {
-                        //     None => (),
-                        //     Some(_) => {
-                        //         self.input_tracking.as_mut().unwrap().check_table.take();
-                        //     }
-                        // }
                         true
                     }
                 }
@@ -252,8 +207,6 @@ impl Component for Table {
     fn view(&self, ctx: &Context<Self>) -> Html {
         // let theme: ThemeContext = ctx.;
 
-        // let mode_state = use_state(|| ctx.props().initial_mode);
-
         let mode_switcher = ctx.link().callback(move |e: Event| {
             let input: HtmlInputElement = e.target_unchecked_into();
             ExerciseMode::from_str(input.value().as_str()).ok()
@@ -261,12 +214,12 @@ impl Component for Table {
                 .unwrap_or(TableMsg::Error)
         });
 
-        let check_answers = ctx.link().callback(move |e: MouseEvent| {
+        let check_answers = ctx.link().callback(move |_e: MouseEvent| {
             TableMsg::CheckClicked
         });
 
         // let paste_detection = ctx.link().batch_callback(|event| {
-        //     if event.key() = "C+V" {
+        //     if event.key() = "V" && event.ctrl() {
         //
         //     }
         // })
@@ -286,7 +239,9 @@ impl Component for Table {
                         <option value="TypeField"      selected={"TypeField" == self.mode.to_string().clone()}>       {"Enter text"} </option>
                         <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()} disabled={self.options_style == OptionsStyle::Disabled}> {"Drop down"} </option>
                     </select>
-                        <button class={"side-options"} onclick={check_answers}> {"check"} </button>
+                    if self.mode.has_input() {
+                        <button class={"check"} onclick={check_answers}> {"check"} </button>
+                    }
                 </div>
             </div>
         }
@@ -311,7 +266,7 @@ impl Table {
         }
     }
 
-    fn mediated_cell(&self, location: &Location, ctx: &Context<Self>) -> Html {
+    fn mediated_cell(&self, location: &Location, _ctx: &Context<Self>) -> Html {
         let cell: ParsedCell = (*self.parsed_table.get(location.0).unwrap().get(location.1).unwrap()).clone();
 
         match cell {
@@ -326,7 +281,7 @@ impl Table {
                     ExerciseMode::CensorByLetter => { empty_html() }
                     ExerciseMode::TypeField => {
                         html! { // TODO lengthen fields when typed into - https://jsfiddle.net/drq0nz6j/
-                            <td class={""}> { text.start } <input class={"table-input"} type="text"/> { text.end } </td>
+                            <td class={""}> { text.start } <input class={"table-input"} type="text" size={5}/> { text.end } </td>
                         }
                     }
                     ExerciseMode::DropDown => {
@@ -337,7 +292,6 @@ impl Table {
                         };
 
                         let check_mode = self.input_tracking.as_ref().unwrap().check_table;
-                        log_display(check_mode);
 
                         html! { <DropDownCell text={text.clone()} location={location.clone()} options={options} check_mode={check_mode}/> }
                     }
@@ -457,9 +411,9 @@ pub enum ExerciseMode {
 impl ExerciseMode {
     fn has_input(&self) -> bool {
         match self {
-            _ => false,
             ExerciseMode::TypeField => true,
             ExerciseMode::DropDown => true,
+            _ => false,
         }
     }
 }
@@ -489,7 +443,6 @@ impl ToString for ExerciseMode {
         ExerciseMode::CensorByLetter => "CensorByLetter",
         ExerciseMode::TypeField =>      "TypeField",
         ExerciseMode::DropDown =>       "DropDown",
-            _ => ""
         }.to_string()
     }
 }

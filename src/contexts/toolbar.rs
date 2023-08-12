@@ -11,11 +11,11 @@ use yew::Callback;
 use yew::context::ContextHandle;
 use yew::html::Scope;
 use yew::prelude::*;
-use yew_router::prelude::*;
 use yew::virtual_dom::VNode;
+use yew_router::prelude::*;
 
+use crate::{html_if_some, log_js, log_str, ProviderProps};
 use crate::app::Route;
-use crate::{log_str, log_js, ProviderProps, html_if_some};
 use crate::contexts::{RunState, ThemeContext, ThemeKind, ThemeSwitcher, use_theme};
 use crate::contexts::runner::{RunnerAction, RunStateType, StateAction};
 
@@ -66,22 +66,22 @@ pub fn toolbar(props: &ToolbarProps) -> Html {
     // let props3 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "3", state: RunStateType::C });
 
     let return_html = props.return_route.clone().map(|return_route| html! {
-                <div class={css!(r#" top: 0px; margin: 2px; left: 10px; "#)}>
-                    <div class={"top-button"}>
-                        <Link<Route> to={return_route}>
+                <div class={css!(r#" margin-left: 5px; "#)}>
+                    <Link<Route> to={return_route}>
+                        <div class={"top-button"}>
                             { "↩" }
-                        </Link<Route>>
-                    </div>
+                        </div>
+                    </Link<Route>>
                 </div>
     }).unwrap_or(html! {<div> </div>} ); // hidden element to align flex parent
 
     let prev = props.prev_route.clone().map(|prev| html! {
                 <div class={css!(r#" "#)}>
-                    <div class={"top-button"}>
-                        <Link<Route> to={prev}>
-                            { "<" }
-                        </Link<Route>>
-                    </div>
+                    <Link<Route> to={prev}>
+                        <div class={"top-button"}>
+                            { "←" }
+                        </div>
+                    </Link<Route>>
                 </div>
     }).unwrap_or(html! {<div> </div>} );
 
@@ -93,11 +93,11 @@ pub fn toolbar(props: &ToolbarProps) -> Html {
 
     let next = props.next_route.clone().map(|next| html! {
                 <div class={css!(r#" "#)}>
-                    <div class={"top-button"}>
-                        <Link<Route> to={next}>
-                            { ">" }
-                        </Link<Route>>
-                    </div>
+                    <Link<Route> to={next}>
+                        <div class={"top-button"}>
+                            { "→" }
+                        </div>
+                    </Link<Route>>
                 </div>
         }
     ).unwrap_or(html! {<div> </div>} );
@@ -117,6 +117,7 @@ pub fn toolbar(props: &ToolbarProps) -> Html {
             display: flex;
             justify-content: space-between;
             font-size: 24pt;
+            line-height: 32px;
             "#
         )} >
             { return_html }

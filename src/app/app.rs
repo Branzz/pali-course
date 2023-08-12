@@ -2,20 +2,16 @@ extern crate console_error_panic_hook;
 
 use std::panic;
 
+use percent_encoding::percent_decode_str;
+use serde_wasm_bindgen::from_value;
 use stylist::yew::{Global, styled_component};
 use yew::prelude::*;
-use yew::props;
-use gloo_net::http::Request;
 use yew_router::prelude::*;
-use wasm_bindgen::JsValue;
-use serde_wasm_bindgen::from_value;
 
-use crate::contexts::toolbar::{TOOLBAR_HEIGHT};
-use crate::contexts::{RunnerProvider, ThemeContext, ThemeKind, ThemeProvider, ToolbarContext,
-                      Toolbar, NamedToolbar, use_theme, ExerciseComponent,  ExerciseComponentProps,
-                      ExerciseMode, Lessons, Lesson, Exercise, Exercises};
 use crate::{get_lessons_json, log_str};
-use percent_encoding::percent_decode_str;
+use crate::contexts::{Exercise, ExerciseComponent, Exercises,
+                      Lesson, Lessons, RunnerProvider, ThemeContext,
+                      ThemeProvider, Toolbar, use_theme};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -35,11 +31,9 @@ pub enum Route {
     Lesson { path: String },
 
     #[at("/pali/lessons/:path")]
-    // #[at("/pali/exercises/:path")]
     RedirectToLesson { path: String },
 
     #[at("/pali/lesson/:path/exercise/404")]
-    // #[at("/pali/exercises/:path")]
     RedirectToLesson2 { path: String },
 
     #[at("/pali/lesson/:lesson_path/exercise/:exercise_path")]
@@ -58,8 +52,6 @@ pub fn main() {
     set_event_bubbling(false);
     yew::Renderer::<Root>::new().render();
 }
-
-
 
 #[styled_component(Root)]
 pub fn root() -> Html {
@@ -106,18 +98,21 @@ pub fn content(props: &DefaultPageProps) -> Html {
     return html! {
         <RunnerProvider>
             { props.toolbar.clone() }
-            <div class={css!(r#"height: calc(100vh - ${th}); width: 100vw;"#, th = TOOLBAR_HEIGHT)}>
+            <div class={css!(
+            r#"width: 100vw;
+               height: 100vh;
+               display: flex;
+               justify-content: center;
+               align-items: baseline;
+               overflow-y: auto;
+               "#)}>
                 <div class={css!(
                     r#"background-color: ${bg_c};
-                       position: relative;
-                       height: calc(100% - 80px);
-                       width: 70%;
-                       left: 10%;
-                       padding: 5%;
-                       padding-top: 2%;
-                       padding-bottom: 20px;
+                       width: 80vw;
+                       max-width: 800px;
                        font-size: 20px;
-                       overflow-y: auto;
+                       min-height: 100%;
+                       padding-top: 25px;
                     "#, bg_c = theme.content_background_color.clone(),
                 )}>
 
@@ -148,7 +143,6 @@ fn switch(routes: Route) -> Html {
         Route::RedirectFromHome => html! { <Redirect<Route> to={Route::Overview} /> },
         Route::Overview => content_titled(String::from("Overview"), None, html! { <>
             <div class={"info"}>
-                // <h1>{ "a" }</h1>
                 <span>{"This is an interactive format from "}</span>
                 <a href="https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up">{"Introduction To Pali by A.K. Warder."}</a>
                 <h2> <Link<Route> to={Route::Lessons}>{ "View Lessons" }</Link<Route>> </h2>
@@ -161,11 +155,11 @@ fn switch(routes: Route) -> Html {
                 <h3> <Link<Route> to={Route::LearningResources}>{ "Other Resources" }</Link<Route>></h3>
                 <span>{"I'll keep this "}</span>
                 <a href="https://github.com/Branzz/pali-course">{"open source"}</a>
-                <span>{". If you'd like to contribute somehow, this was made in a lesson known framework, Yew (React-like) in Rust, transpiled to WebAssembly."}</span>
+                <span>{". If you'd like to contribute somehow, this was made in a Yew (React-like) in Rust, transpiled to WebAssembly."}</span>
                 <br/>
                 <br/>
                 <span>{"The lessons are stored in an intuitive "}</span>
-                <a href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L67">{"json format"}</a>
+                <a href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L48">{"json format"}</a>
                 <span>{", however, so it would be easy to add to that. Most of this isn't hard-coded, so one could clone this and easily use the format for learning anything else."}</span>
                 <br/>
                 <h2> { "Features" } </h2>
@@ -174,20 +168,19 @@ fn switch(routes: Route) -> Html {
                 <ul class={"boxxy"}>
                     <h3> { "Completed" } </h3>
                     <li> { "Framework for lesson creation" } </li>
-                    // <li> { "" } </li>
+                    <li> { "Several exercise modes" } </li>
                 </ul>
                 <ul class={"boxxy"}>
                     <h3> { "In-progress" } </h3>
                     <li> { "Tutorial, Lessons 1-2" } </li>
                     <li> { "Display modes" } </li>
                     <li> { "Dark/Light theme" } </li>
-                    // <li> { "." } </li>
+                    <li> { "Reveal-by-letter mode" } </li>
+                    <li> { "Mobile friendly (mouse-hover, reactive)" } </li>
                 </ul>
                 <ul class={"boxxy"}>
                     <h3> { "Planned / other ideas" } </h3>
-                    <li> { "Pāli letter paste buttons" } </li>
                     <li> { "Lessons 3+" } </li>
-                    <li> { "Mobile friendly (mouse-hover, reactive)" } </li>
                 </ul>
             </div>
         </> }),
@@ -300,8 +293,8 @@ fn switch(routes: Route) -> Html {
                 }
             )
         },
-        Route::NotFound => content_from(html! {
-            <h1>{ "404" }</h1>
+        Route::NotFound => content_titled("404".to_string(), Some(Route::Overview), html! {
+            <h1>{ "Not found" }</h1>
         }),
     }
 }
@@ -318,71 +311,3 @@ fn routed() -> Html {
 pub fn empty_html() -> Html {
     return html! {};
 }
-
-
-
-//                            eof                            //
-
-
-
-// #[styled_component(Comp)]
-// fn comp() -> Html {
-//     return html! {
-//       <>
-//         <div class={css!(
-//             r#"
-//             "#,
-//         )}>
-//             <SampleHOC/>
-//         </div>
-//       </>
-//     }
-// }
-//
-// // wrap users around Component
-// #[function_component]
-// pub fn SampleHOC() -> Html {
-//     let theme = use_theme().kind();
-//     let toolbar_context: ToolbarContext = use_context::<ToolbarContext>().unwrap();
-//     let state = toolbar_context.index().to_string();
-//
-//     let props: SampleProps = props! {
-//         SampleProps{ theme: theme, tb_state: state }
-//     };
-//     html! {
-//         <Sample ..props />
-//     }
-// }
-//
-// #[derive(Properties, PartialEq)]
-// pub struct SampleProps {
-//     pub theme: ThemeKind,
-//     pub tb_state: String,
-// }
-//
-// pub struct Sample;
-//
-// pub struct SampleMsg;
-//
-// impl Component for Sample {
-//     type Message = SampleMsg;
-//     type Properties = SampleProps;
-//
-//     fn create(_ctx: &Context<Self>) -> Self {
-//         Self { }
-//     }
-//
-//     fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
-//         true
-//     }
-//
-//     fn view(&self, ctx: &Context<Self>) -> Html {
-//         let our_str = "font color: ".to_owned() + ctx.props().theme.clone().current().font_color.as_str()
-//                         + " | state: " + &ctx.props().tb_state;
-//
-//         html! {
-//            { our_str }
-//         }
-//     }
-//
-// }
