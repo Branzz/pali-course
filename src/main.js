@@ -53,7 +53,7 @@ export function get_lessons_json() {
  * spell Pāli with a capital and ā
  * The explanation should be something that would spoil the problem when revealed such as a grammar rule
  *   or some sort of exception
- * End any sentence with a period
+ * End every 'fuller' sentence with a period
  * You can't insert HTML into the strings (not my choice)
  * every field is optional (this allows basic text in the middle of the page without even a table)
  *  (except table_layout must have a table)
@@ -69,26 +69,27 @@ export function get_lessons_json() {
  * just copying and reformatting the text over from the textbook.
  *
  */
-const lessons = { "lessons": [
+const lessons = // { "courses": [...]}
+{ "lessons": [
 {
     "name": "Tutorial",
     "path": "tutorial",
     "exercises": [
         {
             "title": "Layout",
-        },
-
-        {
-            "info": "Here's an exercise with the answers covered. Hover over them to reveal. Then, see all the other modes in the drop down; some let you check your answers.",
+            "info": "Here's an exercise with the answers covered. Click on them to reveal one-by-one. Then, see the drop down for the other modes. Some let you check your answers.",
             "table_layout": {
                 "table": [
-                    ["body", "|kāya|"],
-                    ["time", "|kāla|"],
+                    ["Eng",  "Pāli"  ],
+                    ["|body|", "|kāya|"],
+                    ["|time|", "|kāla|"],
                 ],
+                "key_col": 0,
             },
-            "explanation": "\"body\" in Pāli is \"kāya\", and I think you can guess what \"time\" is.",
+            "explanation": "\"body\" in Pāli is kāya. You can guess what \"time\" is :)",
         },
         {
+            "title": "↑",
             "info": "Click the box above to show the explanation for the exercise.",
         },
         {
@@ -112,6 +113,7 @@ const lessons = { "lessons": [
             }
         },
         {
+            "title": "Final",
             "info": "Click the sun/moon on the top right to switch to dark/light mode. Click the arrow on the top right to go to the first lesson."
         }
     ]
@@ -141,7 +143,7 @@ const lessons = { "lessons": [
                 ],
                 "default_mode": "DropDown",
             },
-            "explanation": "e and o are long unless before double consonant.",
+            "explanation": "e and o are long unless before double consonant",
             "page": 4,
         }
     ]

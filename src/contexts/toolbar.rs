@@ -16,34 +16,7 @@ use yew_router::prelude::*;
 
 use crate::{html_if_some, log_js, log_str, ProviderProps};
 use crate::app::Route;
-use crate::contexts::{RunState, ThemeContext, ThemeKind, ThemeSwitcher, use_theme};
-use crate::contexts::runner::{RunnerAction, RunStateType, StateAction};
-
-#[styled_component(RunnerProvider)]
-pub(crate) fn runner_provider(props: &ProviderProps) -> Html {
-    let run_state: ToolbarContext = use_reducer(|| RunState { run_state: RunStateType::B }); // TODO _eq
-
-    html! {
-        <ContextProvider<ToolbarContext> context={run_state}>
-            {props.children.clone()}
-        </ContextProvider<ToolbarContext>>
-    }
-}
-
-pub(crate) type ToolbarContext = UseReducerHandle<RunState>;
-
-impl Reducible for RunState {
-    type Action = RunnerAction;
-
-    fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
-        let next_state = self.state_act(action);
-        match next_state {
-            // RunState { run_state: RunStateType::do_nothing } => self.clone(), // it breaks when users click Nothing buttons otherwise
-            _ => next_state.into()
-        }
-    }
-}
-
+use crate::contexts::{ThemeContext, ThemeKind, ThemeSwitcher, use_theme};
 
 #[derive(Properties, PartialEq)]
 pub struct ToolbarProps {
@@ -56,53 +29,51 @@ pub static TOOLBAR_HEIGHT: &str = "40px";
 
 #[styled_component(Toolbar)]
 pub fn toolbar(props: &ToolbarProps) -> Html {
-    let toolbar_context = use_context::<ToolbarContext>().unwrap();
     let theme_context: ThemeContext = use_theme();
     let theme = theme_context.kind();
     let background_color = theme_context.toolbar_background_color.clone();
+    let font_color = theme_context.font_color.clone(); // String::from("white");
 
-    // let props1 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "1", state: RunStateType::A });
-    // let props2 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "2", state: RunStateType::B });
-    // let props3 = yew::props!(ToolbarButtonProps { theme: theme.clone(), tb_ctx: toolbar_context.clone(), icon_name: "3", state: RunStateType::C });
-
+    let top_button = theme_context.kind().css_class_themed("top-button");
+        // let navigator = use_navigator().unwrap();
     let return_html = props.return_route.clone().map(|return_route| html! {
-                <div class={css!(r#" margin-left: 5px; "#)}>
-                    <Link<Route> to={return_route}>
-                        <div class={"top-button"}>
-                            { "↩" }
-                        </div>
-                    </Link<Route>>
+                <div class={css!(r#" margin-left: 0px; line-height: 34px; "#)}>
+                    <div class={top_button.clone()}>
+                        <Link<Route> to={return_route}>
+                            { "🡴" }
+                        </Link<Route>>
+                    </div>
                 </div>
     }).unwrap_or(html! {<div> </div>} ); // hidden element to align flex parent
 
     let prev = props.prev_route.clone().map(|prev| html! {
-                <div class={css!(r#" "#)}>
-                    <Link<Route> to={prev}>
-                        <div class={"top-button"}>
-                            { "←" }
-                        </div>
-                    </Link<Route>>
+                <div class={css!(r#"line-height: 33px; padding-right: 12px; "#)}>
+                    <div class={top_button.clone()}> // can't put element around link or it will refresh page
+                        // <img src="/arrow.png" width="28" height="28" class={css!("padding-top: 2px;")}/>
+                        <Link<Route> to={prev}>
+                            { "⮜" }
+                        </Link<Route>>
+                    </div>
                 </div>
     }).unwrap_or(html! {<div> </div>} );
 
     let top = props.name.clone().map(|name| html! {
-                <div class={css!(r#" width: 25%; text-align: center; "#)}>
+                <div class={css!(r#" width: min-content; text-align: center; margin-top: 3px; width: 1600px; color: #eae4d7; "#)}> // twice width as content
                     { name }
                 </div>
     }).unwrap_or(html! {<div> </div>} );
 
     let next = props.next_route.clone().map(|next| html! {
-                <div class={css!(r#" "#)}>
-                    <Link<Route> to={next}>
-                        <div class={"top-button"}>
-                            { "→" }
-                        </div>
-                    </Link<Route>>
+                <div class={css!(r#"line-height: 33px; padding-left: 12px; "#)}>
+                    <div class={top_button}>
+                        <Link<Route> to={next}>
+                            { "⮞" }
+                        </Link<Route>>
+                    </div>
                 </div>
         }
     ).unwrap_or(html! {<div> </div>} );
 
-
     html! {
     <>
       <div class={css!(
@@ -110,114 +81,29 @@ pub fn toolbar(props: &ToolbarProps) -> Html {
             width: 100vw;
             height: ${h};
             background-color: ${bg_c};
-            "#, h = TOOLBAR_HEIGHT, bg_c = background_color,
+            color: ${fc};
+            position: absolute;
+            "#, h = TOOLBAR_HEIGHT, bg_c = background_color, fc = font_color
       )}>
         <div class={css!(
             r#"
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             font-size: 24pt;
             line-height: 32px;
             "#
         )} >
-            { return_html }
-            { prev }
-            { top }
-            { next }
-            <ThemeSwitcher />
+            <div class="filler-left flex-spread">
+                { return_html }
+                { prev }
+            </div>
+                { top }
+            <div class="filler-right flex-spread">
+                { next }
+                <ThemeSwitcher />
+            </div>
         </div>
       </div>
     </>
     }
-}
-
-#[styled_component(NamedToolbar)]
-pub fn named_toolbar() -> Html {
-    let toolbar_context = use_context::<ToolbarContext>().unwrap();
-    let theme_context: ThemeContext = use_theme();
-    let theme = theme_context.kind();
-    let background_color = theme_context.toolbar_background_color.clone();
-
-    html! {
-    <>
-      <div class={css!(
-            r#"
-            width: 100vw;
-            height: ${h};
-            background-color: ${bg_c};
-            "#, h = TOOLBAR_HEIGHT, bg_c = background_color,
-      )}>
-      </div>
-    </>
-    }
-}
-
-pub(crate) struct ToolbarButton;
-
-#[derive(Clone, PartialEq, Debug, Properties)]
-pub(crate) struct ToolbarButtonProps {
-    pub theme: ThemeKind,
-    pub tb_ctx: ToolbarContext,
-    pub icon_name: String,
-    pub state: RunStateType,
-}
-
-impl Component for ToolbarButton {
-    type Message = (); // if shift key pressed
-    type Properties = ToolbarButtonProps;
-
-    fn create(ctx: &Context<Self>) -> Self {
-        Self { }
-    }
-
-    #[allow(unused_variables)]
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        true
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let theme: ThemeKind = ctx.props().theme.clone();
-        let tb_ctx: ToolbarContext = ctx.props().tb_ctx.clone();
-        let background_color = theme.current().toolbar_background_color.clone();
-        let icon_name = ctx.props().icon_name.clone();
-        let disabled = icon_name.clone().as_str().ends_with("grayed");
-        let hover_background_color = String::from(if disabled { "transparent" } else { &theme.current().hover_color });
-        let state = ctx.props().state.clone();
-        let mut rgb: [u8; 3] = [30, 30, 30];
-        rgb[tb_ctx.clone().index()] += 105;
-        rgb[state.clone().index()] += 75;
-        let color_str= format!("rgb({:?}, {:?}, {:?})", rgb[0], rgb[1], rgb[2]);
-
-        let callback: Callback<MouseEvent> = Callback::from(move |e: MouseEvent| {
-            // use values from MouseEvent, like if it's a shift click, to do more actions
-            tb_ctx.dispatch( RunnerAction::new(StateAction::To(RunState { run_state: state })) );
-        });
-
-        html! {
-          <>
-            <button class={css!(
-              r#"
-                 height: calc(2.5 * ${h} / 3);
-                 width: calc(2.5 * ${h} / 3);
-                 margin-right: calc(${h} / 4);
-                 margin-top: calc(${h} / 12);
-                 background-size: calc(5 * ${h} / 8);
-                 background-repeat: no-repeat;
-                 background-position: center;
-                 background-image: url("/assets/toolbar_icons/${i}.png");
-                 border: dashed lightslategray 0px;
-                 border-radius: 2px;
-                 transition: all .25s ease-in-out;
-                 background-color: ${c};
-
-                 &:hover {
-                     background-color: ${hbc};
-                 }
-              "#, i = icon_name, hbc = hover_background_color, h = TOOLBAR_HEIGHT, c = color_str
-              )} onclick={callback} >
-            </button>
-          </>
-        }
-    }
-
 }

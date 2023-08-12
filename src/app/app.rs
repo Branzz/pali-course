@@ -1,7 +1,6 @@
 extern crate console_error_panic_hook;
 
 use std::panic;
-
 use percent_encoding::percent_decode_str;
 use serde_wasm_bindgen::from_value;
 use stylist::yew::{Global, styled_component};
@@ -9,9 +8,9 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 use crate::{get_lessons_json, log_str};
-use crate::contexts::{Exercise, ExerciseComponent, Exercises,
-                      Lesson, Lessons, RunnerProvider, ThemeContext,
-                      ThemeProvider, Toolbar, use_theme};
+use crate::contexts::{Exercise, ExerciseComponent, Exercises, Lesson, Lessons, ThemeContext,
+                      ThemeProvider, Toolbar, use_theme, use_lessons, LessonsContext, LessonsProvider};
+use std::ops::Deref;
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -50,45 +49,34 @@ pub enum Route {
 pub fn main() {
     panic::set_hook(Box::new(console_error_panic_hook::hook));
     set_event_bubbling(false);
-    yew::Renderer::<Root>::new().render();
-}
-
-#[styled_component(Root)]
-pub fn root() -> Html {
-    (html! {
-        <ThemeProvider>
-            <App />
-        </ThemeProvider>
-    }) as Html
+    yew::Renderer::<App>::new().render();
 }
 
 #[styled_component(App)]
-fn app() -> Html {
-    let theme: ThemeContext = use_theme();
-    html! {
-        <>
-            // Global Styles can be applied with <Global /> component.
-            <Global css={css!(
-                r#"
-                    html, body {
-                        background-color: ${bg};
-                        color: ${ft_color};
-                    }
-                "#,
-                bg = theme.default_background_color.clone(),
-                ft_color = theme.font_color.clone(),
-            )} />
-
-            <RouteBranching />
-
-        </>
+pub fn app() -> Html {
+    return html! {
+        <BrowserRouter>
+            <Switch<Route> render={switch} />
+        </BrowserRouter>
     }
 }
 
-#[derive(Properties, PartialEq)]
+pub fn empty_html() -> Html {
+    return html! {};
+}
+
+#[derive(Properties, PartialEq, Clone)]
 pub struct DefaultPageProps {
     pub toolbar: Html,
     pub main_content: Html
+}
+
+#[styled_component(ThemedPage)]
+pub fn themed_content(props: &DefaultPageProps) -> Html {
+
+    return html! {
+            <DefaultPage ..props.clone() />
+    }
 }
 
 #[styled_component(DefaultPage)]
@@ -96,36 +84,56 @@ pub fn content(props: &DefaultPageProps) -> Html {
     let theme: ThemeContext = use_theme();
 
     return html! {
-        <RunnerProvider>
-            { props.toolbar.clone() }
+        <>
+
+            // Global Styles can be applied with <Global /> component.
+            <Global css={css!(
+                r#"
+                    html, body {
+                        background-color: ${bg};
+                        color: ${ft};
+                    }
+
+                    a:link, a:visited {
+                        color: ${l};
+                    }
+
+                "#,
+                bg = theme.default_background_color.clone(),
+                ft = theme.font_color.clone(),
+                l = theme.link_color.clone(),
+            )} />
+
+        { props.toolbar.clone() }
+        <div class={css!(
+        r#"width: 100vw;
+           height: 100vh;
+           display: flex;
+           justify-content: center;
+           align-items: baseline;
+           padding-bottom: 25px;
+           "#)}>
             <div class={css!(
-            r#"width: 100vw;
-               height: 100vh;
-               display: flex;
-               justify-content: center;
-               align-items: baseline;
-               overflow-y: auto;
-               "#)}>
-                <div class={css!(
-                    r#"background-color: ${bg_c};
-                       width: 80vw;
-                       max-width: 800px;
-                       font-size: 20px;
-                       min-height: 100%;
-                       padding-top: 25px;
-                    "#, bg_c = theme.content_background_color.clone(),
-                )}>
+                r#"background-color: ${bg_c};
+                   width: 80vw;
+                   max-width: 800px;
+                   font-size: 20px;
+                   min-height: 80%;
+                   padding-top: 25px;
+                   padding-bottom: 75px;
+                "#, bg_c = theme.content_background_color.clone(),
+            )}>
 
-                    { props.main_content.clone() }
+                { props.main_content.clone() }
 
-                </div>
             </div>
-        </RunnerProvider>
+        </div>
+        </>
     }
 }
 
 pub fn content_from_toolbar(toolbar: Html, main_content: Html) -> Html {
-    return html! { <DefaultPage toolbar={toolbar} main_content={main_content} /> }
+    return html! { <ThemedPage toolbar={toolbar} main_content={main_content} /> }
 }
 
 pub fn content_titled(title: String, return_route: Option<Route>, main_content: Html) -> Html {
@@ -136,30 +144,47 @@ pub fn content_from(main_content: Html) -> Html {
     content_from_toolbar(html! { <Toolbar /> }, main_content)
 }
 
-fn switch(routes: Route) -> Html {
-    let mut lessons = from_value::<Lessons>(get_lessons_json()).expect("couldn't load json");
+fn switch(route: Route) -> Html {
+    return html! {
+        <LessonsProvider>
+            <ThemeProvider>
+                <SwitchLessons route={route} />
+            </ThemeProvider>
+        </LessonsProvider>
+    }
+}
 
-    match routes {
+#[derive(Properties, PartialEq)]
+pub struct SwitchLessonsProps {
+    pub route: Route,
+}
+
+#[styled_component(SwitchLessons)]
+pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
+    let lessons_ctx = use_lessons();
+    let lessons = lessons_ctx.get_lessons();
+
+    match props.route.clone() {
         Route::RedirectFromHome => html! { <Redirect<Route> to={Route::Overview} /> },
         Route::Overview => content_titled(String::from("Overview"), None, html! { <>
             <div class={"info"}>
                 <span>{"This is an interactive format from "}</span>
-                <a href="https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up">{"Introduction To Pali by A.K. Warder."}</a>
-                <h2> <Link<Route> to={Route::Lessons}>{ "View Lessons" }</Link<Route>> </h2>
+                <a class="linked" target="_blank" href="https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up">{"Introduction To Pali by A.K. Warder."}</a>
+                <h2 class="linked" > <Link<Route> to={Route::Lessons}>{ "View Lessons" }</Link<Route>> </h2>
                 <span>{"This may not necessarily be correct, so please tell me any errors "}</span>
-                <a href="https://discourse.suttacentral.net/u/bran">{"here"}</a>
+                <a class="linked" href="https://discourse.suttacentral.net/u/bran">{"here"}</a>
                 <span>{r#" or even any suggestions at all.
                             This is definitely a work-in-progress, so not every lesson is as full as I'd like.
                             You can use this to memorize vocab, familiazize yourself, or quiz knowledge to track progression.
                             You should firstly look through the tutorial and options."#}</span>
                 <h3> <Link<Route> to={Route::LearningResources}>{ "Other Resources" }</Link<Route>></h3>
                 <span>{"I'll keep this "}</span>
-                <a href="https://github.com/Branzz/pali-course">{"open source"}</a>
-                <span>{". If you'd like to contribute somehow, this was made in a Yew (React-like) in Rust, transpiled to WebAssembly."}</span>
+                <a class="linked" target="_blank" href="https://github.com/Branzz/pali-course">{"open source"}</a>
+                <span>{". If you'd like to contribute somehow, this was made in Yew (React-like) in Rust, transpiled to WebAssembly."}</span>
                 <br/>
                 <br/>
                 <span>{"The lessons are stored in an intuitive "}</span>
-                <a href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L48">{"json format"}</a>
+                <a class="linked" target="_blank" href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L48">{"json format"}</a>
                 <span>{", however, so it would be easy to add to that. Most of this isn't hard-coded, so one could clone this and easily use the format for learning anything else."}</span>
                 <br/>
                 <h2> { "Features" } </h2>
@@ -187,10 +212,10 @@ fn switch(routes: Route) -> Html {
         Route::LearningResources => content_titled(String::from("Resources"), Some(Route::Overview), html! { <>
             <div class={"info"}>
                 <p class={"spaced"}>{ "Some links I have compiled along with some things I have made" }</p>
-                <h3> <a href={ "https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up" }>{"Warder"}</a> </h3>
-                <h3> <a href={ "https://www.ancient-buddhist-texts.net/Textual-Studies/Grammar/Guide-to-Pali-Grammar.htm" }>{"Rigid grammar guide"}</a> </h3>
-                <h3> <a href={ "https://www.digitalpalireader.online/_dprhtml/index.html" }>{"Digital Pali Reader"}</a> </h3>
-                <h3 class={"spaced"}> <a href={ "https://www.clearmountainmonastery.org/2020/08/01/article-a-fun-way-to-memorize-long-dhamma-with-a-special-focus-on-the-dhammapada/" }>{"Memorizing"}</a> </h3>
+                <h3> <a target="_blank" href={ "https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up" }>{"Warder"}</a> </h3>
+                <h3> <a target="_blank" href={ "https://www.ancient-buddhist-texts.net/Textual-Studies/Grammar/Guide-to-Pali-Grammar.htm" }>{"Rigid grammar guide"}</a> </h3>
+                <h3> <a target="_blank" href={ "https://www.digitalpalireader.online/_dprhtml/index.html" }>{"Digital Pali Reader"}</a> </h3>
+                <h3 class={"spaced"}> <a target="_blank" href={ "https://www.clearmountainmonastery.org/2020/08/01/article-a-fun-way-to-memorize-long-dhamma-with-a-special-focus-on-the-dhammapada/" }>{"Memorizing"}</a> </h3>
             </div>
             <div class={"centered"}> <img src="/phoen.png" /> </div>
             <div class={"centered"}> <img src="/sandhi.png" /> </div>
@@ -216,7 +241,7 @@ fn switch(routes: Route) -> Html {
             let return_route = Some(Route::Lessons);
             let prev_path = if lesson_position == 0 {None} else {lessons.lessons.get(lesson_position - 1).map(|l: &Lesson| l.path.clone())};
             let next_path = lessons.lessons.get(lesson_position + 1).map(|l: &Lesson| l.path.clone());
-            let lesson: Lesson = lessons.lessons.remove(lesson_position);
+            let lesson: Lesson = (*lessons.lessons.get(lesson_position).unwrap()).clone();
 
             let prev_route = prev_path.map(|path| Route::Lesson { path });
             let next_route = next_path.map(|path| Route::Lesson { path });
@@ -237,12 +262,10 @@ fn switch(routes: Route) -> Html {
             }
             let lesson_position = lesson_position_opt.unwrap();
 
-            let mut lesson: Lesson = lessons.lessons.remove(lesson_position);
+            let mut lesson: Lesson = (*lessons.lessons.get(lesson_position).unwrap()).clone();
             let lesson_path = lesson.path;
 
             let decoded_exercise_path = percent_decode_str(exercise_path.as_str()).decode_utf8().unwrap();
-
-            log_str(&*decoded_exercise_path.clone());
 
             let exercise_position_opt = lesson.exercises.iter().position(|e: &Exercise| e.effective_path() == decoded_exercise_path);
             if exercise_position_opt.is_none() {
@@ -267,7 +290,7 @@ fn switch(routes: Route) -> Html {
                     if lesson_position == lessons.lessons.len() - 1 {
                         (None, None)
                     } else {
-                        let l: Option<&Lesson> = lessons.lessons.get(lesson_position);
+                        let l: Option<&Lesson> = lessons.lessons.get(lesson_position + 1);
                         (l.map(|l: &Lesson| l.path.clone()), l.map(|l: &Lesson| l.exercises.first()).flatten().map(|e| e.effective_path().clone()))
                     }
                 } else {
@@ -297,17 +320,5 @@ fn switch(routes: Route) -> Html {
             <h1>{ "Not found" }</h1>
         }),
     }
-}
 
-#[function_component(RouteBranching)]
-fn routed() -> Html {
-    return html! {
-        <BrowserRouter>
-            <Switch<Route> render={switch} /> // <- must be child of <BrowserRouter>
-        </BrowserRouter>
-    }
-}
-
-pub fn empty_html() -> Html {
-    return html! {};
 }

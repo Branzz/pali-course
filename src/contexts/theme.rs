@@ -1,6 +1,5 @@
 use std::any::Any;
-use std::ops::Deref;
-
+use std::ops::{Deref, Add};
 use once_cell::sync::Lazy;
 use stylist::yew::styled_component;
 use yew::html::ImplicitClone;
@@ -10,7 +9,7 @@ use yew::virtual_dom::VChild;
 use crate::{prefers_dark_scheme, ProviderProps};
 
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum ThemeKind {
+pub enum ThemeKind {
     Dark,
     Light,
 }
@@ -20,25 +19,29 @@ impl ImplicitClone for ThemeKind {}
 impl ThemeKind {
     pub fn current(&self) -> &Theme {
         static LIGHT_THEME: Lazy<Theme> = Lazy::new(|| Theme {
+            kind: ThemeKind::Light,
             font_color: "black".to_string(),
             content_background_color: "rgb(237, 244, 255)".to_string(),
             default_background_color: "#D5D5D5".to_string(),
-            toolbar_background_color: "rgb(180, 190, 200)".to_string(),
-            icon_background_color: "#235".to_string(),
+            toolbar_background_color: "rgb(225, 129, 17)".to_string(),
+            icon_background_color: "#24F".to_string(),
             other_background_color: "white".to_string(),
             hover_color: "#444".to_string(),
-            icon_name: "moon_icon".to_string(),
+            icon_name: "sun_icon".to_string(),
+            link_color: "#5a2ab9".to_string(),
         });
 
         static DARK_THEME: Lazy<Theme> = Lazy::new(|| Theme {
+            kind: ThemeKind::Dark,
             font_color: "white".to_string(),
             content_background_color: "#101014".to_string(),
             default_background_color: "#151515".to_string(),
-            toolbar_background_color: "rgb(150, 90, 20)".to_string(),
-            icon_background_color: "#24F".to_string(),
+            toolbar_background_color: "rgb(175, 100, 10)".to_string(),
+            icon_background_color: "#235".to_string(),
             other_background_color: "rgb(50, 50, 50)".to_string(),
             hover_color: "#AAA".to_string(),
-            icon_name: "sun_icon".to_string(),
+            icon_name: "moon_icon".to_string(),
+            link_color: "#AB90FF".to_string(),
         });
 
         match self {
@@ -51,10 +54,26 @@ impl ThemeKind {
         vec![ThemeKind::Dark, ThemeKind::Light]
     }
 
+    /**
+     * "class" -> "class class--theme"
+     */
+    pub fn css_class_themed(&self, class_name: &str) -> String {
+        let mut themed_class: String = String::new();
+        themed_class.push_str(class_name);
+        themed_class.push(' ');
+        themed_class.push_str(class_name);
+        themed_class.push_str(match self {
+            ThemeKind::Dark => "--dark",
+            ThemeKind::Light => "--light",
+        });
+        themed_class
+    }
+
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct Theme {
+pub struct Theme {
+    pub kind: ThemeKind,
     pub font_color: String,
     pub content_background_color: String,
     pub default_background_color: String,
@@ -63,6 +82,7 @@ pub(crate) struct Theme {
     pub other_background_color: String,
     pub hover_color: String,
     pub icon_name: String,
+    pub link_color: String,
 }
 
 #[derive(Debug, Clone)]
@@ -137,7 +157,7 @@ pub(crate) fn use_theme() -> ThemeContext {
 // }
 
 /**
- * the sun and moon button that cycles between themes.
+ * The sun and moon button that cycles between themes.
  */
 #[styled_component(ThemeSwitcher)]
 pub fn theme_switcher() -> Html {
@@ -156,8 +176,8 @@ pub fn theme_switcher() -> Html {
         <div class={css!( r#" display: inline; "#)}>
             <button class={css!(
              r#"
-                height: 30px;
-                width: 30px;
+                height: 37px;
+                width: 37px;
                 background-size: 30px;
                 background-repeat: no-repeat;
                 border-radius: 50%;
@@ -171,7 +191,7 @@ pub fn theme_switcher() -> Html {
                 top: -20px;
                 right: 10px;
                 vertical-align: middle;
-                margin-right: 5px;
+                margin-right: 20px;
                 &:hover {
                     transform: rotate(-10deg);
                     background-color: ${bg_c};

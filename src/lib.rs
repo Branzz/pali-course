@@ -8,8 +8,9 @@
 #![feature(pattern)]
 #![feature(string_remove_matches)]
 
-use std::fmt::{Debug, Display};
+// #![allow(dead_code)]
 
+use std::fmt::{Debug, Display};
 use wasm_bindgen::prelude::*;
 use yew::{Html, Properties};
 use yew::Children;

@@ -5,7 +5,6 @@ use std::panic;
 use std::slice::Iter;
 use std::str::FromStr;
 use std::str::pattern::{Pattern, Searcher, SearchStep};
-
 use gloo_net::http::Request;
 use itertools::{Itertools, Unique};
 use percent_encoding::percent_decode_str;
@@ -17,23 +16,22 @@ use wasm_bindgen::JsValue;
 use web_sys::{EventTarget, HtmlInputElement};
 use yew::{Callback, Html, html, Properties, use_state};
 use yew::prelude::*;
-use yew::prelude::*;
 use yew::props;
 use yew_router::prelude::*;
 
 use crate::{get_lessons_json, log_dbg, log_display, log_str};
 use crate::app::empty_html;
 use crate::contexts::{DEFAULT_SELECTION_STRING, DropDownCell, Exercise, ExerciseComponent, ExerciseComponentProps,
-                      Exercises, Lesson, Lessons, NamedToolbar,
-                      RunnerProvider, SpoilerCell, ThemeContext, ThemeKind, ThemeProvider, Toolbar, ToolbarContext};
+                      Exercises, Lesson, Lessons, SpoilerCell, ThemeContext, ThemeKind, ThemeProvider, Toolbar};
 use crate::contexts::toolbar::TOOLBAR_HEIGHT;
 use crate::contexts::use_theme;
 use crate::html_if_some;
+use crate::contexts::theme::Theme;
 
 type DataTable = Vec<Vec<String>>;
 
 #[derive(Properties, PartialEq, Clone, Deserialize)]
-pub struct TableProps {
+pub struct TableLayout {
     // pub table: DataTable,
     // pub initial_mode: ExerciseMode,
     pub table: DataTable,
@@ -41,6 +39,19 @@ pub struct TableProps {
     pub shuffle_rows: Option<bool>,
     pub default_mode: Option<ExerciseMode>, // Default: Censor
     pub options_style_type: Option<OptionsStyleType>, // predicted
+}
+// wrap around Component
+#[function_component(TableHOC)]
+pub fn table_hoc(hoc_props: &TableLayout) -> Html {
+    let theme = use_theme().kind();
+    let props: ThemedTableProps = ThemedTableProps { theme, table_layout: hoc_props.clone() };
+    html! { <Table ..props /> }
+}
+
+#[derive(Properties, PartialEq, Clone)]
+pub struct ThemedTableProps {
+    pub theme: ThemeKind,
+    pub table_layout: TableLayout,
 }
 
 #[derive(PartialEq, Clone, Deserialize)]
@@ -152,21 +163,22 @@ pub enum TableMsg {
 
 impl Component for Table {
     type Message = TableMsg;
-    type Properties = TableProps;
+    type Properties = ThemedTableProps;
 
     fn create(ctx: &Context<Self>) -> Self {
         // let mut initial_mode = ctx.props().default_mode.clone().map(|s| ExerciseMode::from_str(s.as_str()).unwrap_or(ExerciseMode::Censor)).unwrap_or(ExerciseMode::Censor);
 
-        let parsed_table = create_parsed_table(&ctx.props().table);
-        let location_table = create_location_table(&ctx.props().table);
-        let options_summary = create_options_style(ctx.props().options_style_type.clone(), &parsed_table, &location_table);
+        let parsed_table = create_parsed_table(&ctx.props().table_layout.table);
+        let location_table = create_location_table(&ctx.props().table_layout.table);
+        let options_summary = create_options_style(ctx.props().table_layout.options_style_type.clone(), &parsed_table, &location_table);
+        let uninteractive = !parsed_table.iter().flat_map(|v| v).find(|c| c.is_interactive()).is_some();
 
         Self {
             // table: ctx.props().table.clone(),
             parsed_table,
             location_table,
             input_tracking: options_summary.1.map(|input_table| InputTracking { input_table, check_table: false } ),
-            mode: ctx.props().default_mode.clone().unwrap_or(ExerciseMode::ClickReveal),
+            mode: ctx.props().table_layout.default_mode.clone().unwrap_or(if uninteractive {ExerciseMode::Disabled} else {ExerciseMode::ClickReveal}),
             options_style: options_summary.0,
         }
     }
@@ -205,7 +217,12 @@ impl Component for Table {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        // let theme: ThemeContext = ctx.;
+        let theme = &ctx.props().theme;
+        let table_area = theme.css_class_themed("table-area");
+        let table_secondary_classes = theme.css_class_themed("table-secondary");
+        let mut side_options = theme.css_class_themed("side-options");
+        let mut check = table_secondary_classes.clone();
+        check.push_str(" check");
 
         let mode_switcher = ctx.link().callback(move |e: Event| {
             let input: HtmlInputElement = e.target_unchecked_into();
@@ -223,26 +240,29 @@ impl Component for Table {
         //
         //     }
         // })
+        let disabled = self.mode == ExerciseMode::Disabled;
 
         return html! {
-            <div class={"table-area"}>
+            <div class={table_area}>
                 <div class={"filler-left"}>
                     // important lesson marker
                 </div>
                 <div class={"filler-center"}>{ self.table_html(ctx) } </div>
-                <div class={"filler-right"}>
-                    <select class={"side-options"} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
-                        <option value="Show"           selected={"Show" == self.mode.to_string().clone()}>            {"Reveal all"} </option>
-                        <option value="HoverReveal"    selected={"HoverReveal" == self.mode.to_string().clone()}>     {"Hover reveal"} </option>
-                        <option value="ClickReveal"    selected={"ClickReveal" == self.mode.to_string().clone()}>     {"Click reveal"} </option>
-                     // <option value="CensorByLetter" selected={"CensorByLetter" == self.mode.to_string().clone()}>  {"Reveal by letter"} </option>
-                        <option value="TypeField"      selected={"TypeField" == self.mode.to_string().clone()}>       {"Enter text"} </option>
-                        <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()} disabled={self.options_style == OptionsStyle::Disabled}> {"Drop down"} </option>
-                    </select>
-                    if self.mode.has_input() {
-                        <button class={"check"} onclick={check_answers}> {"check"} </button>
-                    }
-                </div>
+                    <div class={"filler-right"}>
+                        if !disabled {
+                            <select class={side_options} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
+                                <option value="Show"           selected={"Show" == self.mode.to_string().clone()}>            {"Reveal all"} </option>
+                                <option value="HoverReveal"    selected={"HoverReveal" == self.mode.to_string().clone()}>     {"Hover reveal"} </option>
+                                <option value="ClickReveal"    selected={"ClickReveal" == self.mode.to_string().clone()}>     {"Click reveal"} </option>
+                             // <option value="CensorByLetter" selected={"CensorByLetter" == self.mode.to_string().clone()}>  {"Reveal by letter"} </option>
+                                <option value="TypeField"      selected={"TypeField" == self.mode.to_string().clone()}>       {"Enter text"} </option>
+                                <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()} disabled={self.options_style == OptionsStyle::Disabled}> {"Drop down"} </option>
+                            </select>
+                            if self.mode.has_input() {
+                                <button class={check} onclick={check_answers}> {"check"} </button>
+                            }
+                        }
+                    </div>
             </div>
         }
     }
@@ -268,22 +288,20 @@ impl Table {
 
     fn mediated_cell(&self, location: &Location, _ctx: &Context<Self>) -> Html {
         let cell: ParsedCell = (*self.parsed_table.get(location.0).unwrap().get(location.1).unwrap()).clone();
+        let theme = &_ctx.props().theme;
+        let table_secondary_classes = theme.css_class_themed("table-secondary");
+        let table_input = theme.css_class_themed("table-input");
 
         match cell {
             ParsedCell::Label(val) => html! { <td> {val} </td> },
             ParsedCell::Interactive(text) => {
-                // let (start, middle, end) = split;
-
                 return match self.mode.clone() {
-                    ExerciseMode::Show => html! { <td class={"interactive"}> { text.start }  { text.middle } { text.end } </td> },
-                    ExerciseMode::HoverReveal => html! { <td class={"spoilable"}> { text.start } <span class={"spoiler"}> { text.middle } </span> { text.end } </td> },
-                    ExerciseMode::ClickReveal => html! { <SpoilerCell text={text}/> },
+                    ExerciseMode::Show => html! { <td class={theme.css_class_themed("interactive")}> { text.start }  { text.middle } { text.end } </td> },
+                    ExerciseMode::HoverReveal => html! { <td class={theme.css_class_themed("spoilable")}> { text.start } <span class={theme.css_class_themed("spoiler")}> { text.middle } </span> { text.end } </td> },
+                    ExerciseMode::ClickReveal => html! { <SpoilerCell text={text} class={theme.css_class_themed("spoilable")}/> },
                     ExerciseMode::CensorByLetter => { empty_html() }
-                    ExerciseMode::TypeField => {
-                        html! { // TODO lengthen fields when typed into - https://jsfiddle.net/drq0nz6j/
-                            <td class={""}> { text.start } <input class={"table-input"} type="text" size={5}/> { text.end } </td>
-                        }
-                    }
+                    // TODO lengthen fields when typed into - https://jsfiddle.net/drq0nz6j/
+                    ExerciseMode::TypeField => html! { <td class={""}> { text.start } <input class={table_input} type="text" size={5}/> { text.end } </td> },
                     ExerciseMode::DropDown => {
                         let options = match self.options_style.clone() {
                             OptionsStyle::Disabled => unreachable!("Accessed drop down when it was disabled"),
@@ -292,9 +310,11 @@ impl Table {
                         };
 
                         let check_mode = self.input_tracking.as_ref().unwrap().check_table;
+                        let class = theme.css_class_themed("table-input");
 
-                        html! { <DropDownCell text={text.clone()} location={location.clone()} options={options} check_mode={check_mode}/> }
-                    }
+                        html! { <DropDownCell text={text.clone()} class={table_input} location={location.clone()} options={options} check_mode={check_mode}/> }
+                    },
+                    ExerciseMode::Disabled => { log_display(text.middle); html!{} } ,
                 }
             }
         }
@@ -400,6 +420,7 @@ impl ParsedCell {
 
 #[derive(PartialEq, Clone, Deserialize, Debug)]
 pub enum ExerciseMode {
+    Disabled,
     Show, // ABC
     HoverReveal, // [][][]
     ClickReveal, // [] -> A
@@ -429,6 +450,7 @@ impl FromStr for ExerciseMode {
             "CensorByLetter" => Ok(ExerciseMode::CensorByLetter),
             "TypeField"      => Ok(ExerciseMode::TypeField),
             "DropDown"       => Ok(ExerciseMode::DropDown),
+            "Disabled"       => Ok(ExerciseMode::Disabled),
             _ => Err(())
         }
     }
@@ -443,6 +465,7 @@ impl ToString for ExerciseMode {
         ExerciseMode::CensorByLetter => "CensorByLetter",
         ExerciseMode::TypeField =>      "TypeField",
         ExerciseMode::DropDown =>       "DropDown",
+        ExerciseMode::Disabled =>       "Disabled",
         }.to_string()
     }
 }

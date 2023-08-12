@@ -1,15 +1,17 @@
 use web_sys::{HtmlInputElement, MouseEvent};
 use yew::{Component, Context, Html, html, Properties};
 use yew::prelude::*;
+use std::collections::HashMap;
 
 use crate::{log, log_display};
 use crate::contexts::table::{InputTracking, Location};
 use crate::contexts::TriSplit;
-use std::collections::HashMap;
 
 #[derive(Properties, PartialEq)]
 pub struct SpoilerCellProps {
+    pub class: String,
     pub text: TriSplit,
+    pub do_fading: Option<()>,
 }
 
 pub struct SpoilerCell {
@@ -45,9 +47,13 @@ impl Component for SpoilerCell {
 
         let spoil_class = if self.spoiled { "spoiler_button invisible" } else { "spoiler_button visible" };
         let text = ctx.props().text.clone();
+        let mut td_class = ctx.props().class.clone();
+        if ctx.props().do_fading.is_some() && self.spoiled {
+            td_class.push_str(" fade-in");
+        }
 
-        html! {
-            <td class={"interactive"} onmousedown={onclick.clone()}> { text.start } <span class={spoil_class} onmousedown={onclick}> { text.middle } </span> { text.end } </td>
+        return html! {
+            <td class={td_class} onmousedown={onclick.clone()}> { text.start } <span class={spoil_class} onmousedown={onclick}> { text.middle } </span> { text.end } </td>
         }
     }
 
@@ -57,6 +63,7 @@ pub(crate) const DEFAULT_SELECTION_STRING: String = String::new();
 
 #[derive(Properties, PartialEq)]
 pub struct InteractiveCellProps {
+    pub class: String,
     pub text: TriSplit,
     pub options: Vec<String>,
     pub location: Location,
@@ -109,10 +116,12 @@ impl Component for DropDownCell {
             };
 
         // let selected = &ctx.props().options.first().map(|s: &String| s.clone()).unwrap_or(String::new());
+        let mut class = ctx.props().class.clone();
+        class.push_str(" table-input");
 
-        html! {
+        return html! {
             <td class={checked_class}> { text.start }
-                <select class={"table-input"} onchange={dropdown_changed.clone()} required={true}>
+                <select class={class} onchange={dropdown_changed.clone()} required={true}>
                     <option value={DEFAULT_SELECTION_STRING.clone()} disabled={true} selected={true} hidden={true}> {DEFAULT_SELECTION_STRING.clone()} </option>
                     { for (&ctx).props().options.iter().map(|o| { html! {
                         <option value={o.clone()}>{o}</option>

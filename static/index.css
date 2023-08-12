@@ -1,0 +1,283 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    font-family: "Skolar Sutta Web", serif;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+body {
+    overflow-y: auto;
+}
+
+/*.linked {*/
+
+/*}*/
+
+a:link, a:visited {
+    text-decoration: none;
+}
+
+.centered, h1, h2, h3 {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+
+.spaced {
+    margin-bottom: 50px;
+}
+
+.top-button {
+    border-radius: 10px;
+    font-size: 20pt;
+    margin-top: 3px;
+    margin-right: 3px;
+    margin-left: 3px;
+    height: 32px;
+    width: 32px;
+    text-align: center;
+    position: relative;
+}
+
+.top-button--light {
+    background-color: #f5b125;
+    border: 1px #946404 solid;
+    border-color: #584003;
+}
+
+.top-button--dark a {
+    color: #f8ddc4 !important;
+}
+
+.top-button--light a {
+    color: #eaddd8 !important;
+}
+
+.top-button--dark {
+    background-color: #d58f07;;
+    border: 1px #664b16 solid;
+}
+
+.stretched {
+    width: 100%;
+}
+
+.listed-info {
+    font-size: 30px;
+}
+
+.listed-info a {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.info {
+    margin: 25px 15% 25px 15%;
+}
+
+.flex-spread {
+    display: flex;
+    justify-content: space-between;
+}
+
+.flexer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-surround {
+    display: flex;
+    justify-content: space-around;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
+.boxxy {
+    flex: 1 1 0;
+    margin: 3px;
+    padding-bottom: 5px;
+    border: 1px gray dashed;
+    border-radius: 2px;
+}
+
+li {
+    margin-left: 25px;
+}
+
+.table-area {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.table-area--dark {
+    border-color: #CCC;
+}
+
+.table-area--light {
+    border-color: black;
+}
+
+.filler-left {
+    width: 50%;
+}
+
+.filler-center {
+}
+
+.filler-right {
+    width: 50%;
+}
+
+.exercise-table {
+    border-collapse: collapse;
+    border: 1px solid;
+    display: inline-table;
+}
+
+table, th, td {
+    padding: 4px 6px;
+    border: 1px solid;
+}
+
+.spoilable--dark,
+.table-secondary--dark,
+.side-options--dark,
+.table-input--dark,
+.interactive--dark {
+    background-color: #202031;
+    /*background-color: #241820;*/
+}
+
+.spoiler--dark,
+.spoiler--dark::selection {
+    color: #202031;
+}
+
+.spoilable--light,
+.table-secondary--light,
+.side-options--light,
+.table-input--light,
+.interactive--light {
+    background-color: #f5f0ec;
+}
+
+.spoiler--light,
+.spoiler--light::selection {
+    color: #f5f0ec;
+}
+
+.spoilable--dark:hover .spoiler--dark,
+.spoilable--dark:hover .spoiler--dark::selection {
+    color: white;
+}
+
+.spoilable--light:hover .spoiler--light,
+.spoilable--light:hover .spoiler--light::selection {
+    color: black;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.visible {}
+
+.table-input {}
+
+.correct_cell {
+    background-color: lightgreen;
+}
+
+.incorrect_cell {
+    background-color: lightcoral;
+}
+
+.side-options {
+    width: fit-content;
+    height: fit-content;
+    display: inline-table;
+    margin-left: 10px;
+    padding-bottom: 2px;
+}
+
+select, .table-input {
+    font-family: "Skolar Sutta Web", serif;
+    font-size: 20px;
+    border-radius: 3px;
+    padding-left: 2px;
+}
+
+.check {
+    font-family: "Skolar Sutta Web", serif;
+    font-size: 16px;
+    border: 1px solid;
+    margin-left: 10px;
+    border-radius: 3px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-bottom: 1px;
+}
+
+.table-secondary {}
+
+.table-input--dark,
+.side-options--dark {
+    color: white;
+    border-style: groove;
+    border-color: #CCC;
+    border-width: 1px;
+}
+
+.table-input--light,
+.side-options--light {
+    color: black;
+    border-style: groove;
+    border-color: #333;
+    border-width: 1px;
+}
+
+.table-secondary--dark {
+    color: white;
+    border-color: #b39a89;
+}
+
+.table-secondary--light {
+    color: black;
+    border-color: black;
+}
+
+button {
+    border-color: unset;
+}
+
+option {
+}
+
+.ref {
+    font-size: 14pt;
+    display: block;
+    font-style: italic;
+}
+
+.explanation { }
+
+.fade-in {
+    transition: 0.15s cubic-bezier(0.3,0.2,0.1,1.0);
+    opacity: 0.4;
+}
+
+.fade-in:hover {
+    opacity: 1;
+}
