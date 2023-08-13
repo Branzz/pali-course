@@ -118,8 +118,8 @@ pub fn content(props: &DefaultPageProps) -> Html {
                    width: 80vw;
                    max-width: 800px;
                    font-size: 20px;
-                   min-height: 80%;
-                   padding-top: 25px;
+                   min-height: calc(100% - 140px);
+                   padding-top: 65px;
                    padding-bottom: 75px;
                 "#, bg_c = theme.content_background_color.clone(),
             )}>
@@ -194,18 +194,18 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                     <h3> { "Completed" } </h3>
                     <li> { "Framework for lesson creation" } </li>
                     <li> { "Several exercise modes" } </li>
+                    <li> { "Dark/Light theme" } </li>
                 </ul>
                 <ul class={"boxxy"}>
                     <h3> { "In-progress" } </h3>
                     <li> { "Tutorial, Lessons 1-2" } </li>
-                    <li> { "Display modes" } </li>
-                    <li> { "Dark/Light theme" } </li>
                     <li> { "Reveal-by-letter mode" } </li>
                     <li> { "Mobile friendly (mouse-hover, reactive)" } </li>
                 </ul>
                 <ul class={"boxxy"}>
                     <h3> { "Planned / other ideas" } </h3>
                     <li> { "Lessons 3+" } </li>
+                    <li> { "Shuffle rows" } </li>
                 </ul>
             </div>
         </> }),
@@ -251,7 +251,7 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                     <Toolbar name={lesson.name} return_route={return_route} prev_route={prev_route} next_route={next_route}/>
                 },
                 html! {
-                    <Exercises exercises={lesson.exercises}/>
+                    <Exercises lesson_path={Some(path)} exercises={lesson.exercises}/>
                 }
             )
         },
@@ -312,7 +312,7 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                     <Toolbar name={lesson.name} return_route={return_route} prev_route={prev_route} next_route={next_route}/>
                 },
                 html! {
-                    <ExerciseComponent exercise={exercise}/>
+                    <ExerciseComponent lesson_path={Option::<String>::None} exercise={exercise}/>
                 }
             )
         },

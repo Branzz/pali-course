@@ -46,6 +46,11 @@ a:link, a:visited {
     position: relative;
 }
 
+.top-button--dark {
+    background-color: #df980f;;
+    border: 1px #664b16 solid;
+}
+
 .top-button--light {
     background-color: #f5b125;
     border: 1px #946404 solid;
@@ -57,13 +62,9 @@ a:link, a:visited {
 }
 
 .top-button--light a {
-    color: #eaddd8 !important;
+    color: #fff6f1 !important;
 }
 
-.top-button--dark {
-    background-color: #d58f07;;
-    border: 1px #664b16 solid;
-}
 
 .stretched {
     width: 100%;
@@ -81,7 +82,7 @@ a:link, a:visited {
 }
 
 .info {
-    margin: 25px 15% 25px 15%;
+    margin: 15px 15% 25px 15%;
 }
 
 .flex-spread {
@@ -105,10 +106,15 @@ a:link, a:visited {
 .boxxy {
     flex: 1 1 0;
     margin: 3px;
-    padding-bottom: 5px;
+    padding-bottom: 15px;
     border: 1px gray dashed;
     border-radius: 2px;
 }
+
+.exercise-link-zone:hover > .filler-right > div {
+    visibility: visible;
+}
+
 
 li {
     margin-left: 25px;
@@ -140,6 +146,11 @@ li {
     width: 50%;
 }
 
+.table-right {
+    margin-left: 6px;
+    display: grid;
+}
+
 .exercise-table {
     border-collapse: collapse;
     border: 1px solid;
@@ -149,6 +160,8 @@ li {
 table, th, td {
     padding: 4px 6px;
     border: 1px solid;
+    white-space: nowrap;
+
 }
 
 .spoilable--dark,
@@ -170,12 +183,12 @@ table, th, td {
 .side-options--light,
 .table-input--light,
 .interactive--light {
-    background-color: #f5f0ec;
+    background-color: #f0eeee;
 }
 
 .spoiler--light,
 .spoiler--light::selection {
-    color: #f5f0ec;
+    color: #f0eeee;
 }
 
 .spoilable--dark:hover .spoiler--dark,
@@ -209,7 +222,9 @@ table, th, td {
     height: fit-content;
     display: inline-table;
     margin-left: 10px;
+    margin-bottom: 16px;
     padding-bottom: 2px;
+    padding-right: 4px;
 }
 
 select, .table-input {
@@ -228,6 +243,14 @@ select, .table-input {
     padding-left: 2px;
     padding-right: 2px;
     padding-bottom: 1px;
+}
+
+.check_clicked_class--dark {
+    background-color: #111121;
+}
+
+.check_clicked_class--light {
+    background-color: #d2c7c7;
 }
 
 .table-secondary {}
@@ -273,11 +296,17 @@ option {
 
 .explanation { }
 
+.check:hover{
+    cursor: pointer;
+}
+
+
 .fade-in {
-    transition: 0.15s cubic-bezier(0.3,0.2,0.1,1.0);
+    transition: 0.1s ease-in-out;
     opacity: 0.4;
 }
 
 .fade-in:hover {
     opacity: 1;
+    cursor: help;
 }

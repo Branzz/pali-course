@@ -13,6 +13,7 @@ use serde_wasm_bindgen::from_value;
 
 #[derive(Properties, PartialEq)]
 pub struct ExercisesProps {
+    pub lesson_path: Option<String>, // for anonymous lessons or single-page exercise
     pub exercises: Vec<Exercise>
 }
 
@@ -20,7 +21,7 @@ pub struct ExercisesProps {
 pub fn exercises(props: &ExercisesProps) -> Html {
     return html! {
         { for props.exercises.iter().map(|e| html! {
-            <ExerciseComponent exercise={e.clone()} />
+            <ExerciseComponent lesson_path={props.lesson_path.clone()} exercise={e.clone()} />
         }) }
     }
 }

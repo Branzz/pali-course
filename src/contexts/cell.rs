@@ -3,7 +3,7 @@ use yew::{Component, Context, Html, html, Properties};
 use yew::prelude::*;
 use std::collections::HashMap;
 
-use crate::{log, log_display};
+use crate::{log, log_display, log_js};
 use crate::contexts::table::{InputTracking, Location};
 use crate::contexts::TriSplit;
 
@@ -62,7 +62,7 @@ impl Component for SpoilerCell {
 pub(crate) const DEFAULT_SELECTION_STRING: String = String::new();
 
 #[derive(Properties, PartialEq)]
-pub struct InteractiveCellProps {
+pub struct DropDownCellProps {
     pub class: String,
     pub text: TriSplit,
     pub options: Vec<String>,
@@ -74,13 +74,13 @@ pub struct DropDownCell {
     pub selected: String,
 }
 
-pub enum DropDownCellMsg {
+pub enum InteractiveCellMsg {
     Update(String)
 }
 
 impl Component for DropDownCell {
-    type Message = DropDownCellMsg;
-    type Properties = InteractiveCellProps;
+    type Message = InteractiveCellMsg;
+    type Properties = DropDownCellProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
@@ -90,7 +90,7 @@ impl Component for DropDownCell {
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            DropDownCellMsg::Update(value) => { self.selected = value; true }
+            InteractiveCellMsg::Update(value) => { self.selected = value; true }
         }
     }
 
@@ -100,22 +100,11 @@ impl Component for DropDownCell {
 
         let dropdown_changed = ctx.link().callback(move |e: Event| {
             let input: HtmlInputElement = e.target_unchecked_into();
-            DropDownCellMsg::Update(input.value())
+            InteractiveCellMsg::Update(input.value())
         });
 
-        let checked_class =
-            if ctx.props().check_mode && (self.selected != DEFAULT_SELECTION_STRING) {
-                if self.selected == ctx.props().text.middle.clone()
-                    || iso_shorthand_equals(&self.selected, &ctx.props().text.middle.clone()) {
-                    "correct_cell"
-                } else {
-                    "incorrect_cell"
-                }
-            } else {
-                ""
-            };
+        let checked_class = check_input(ctx.props().check_mode, self.selected.clone(), ctx.props().text.middle.clone());
 
-        // let selected = &ctx.props().options.first().map(|s: &String| s.clone()).unwrap_or(String::new());
         let mut class = ctx.props().class.clone();
         class.push_str(" table-input");
 
@@ -133,6 +122,107 @@ impl Component for DropDownCell {
 
 }
 
+pub struct TypeFieldCell {
+    pub content: String,
+}
+
+
+#[derive(Properties, PartialEq)]
+pub struct TypeFieldCellProps {
+    pub class: String,
+    pub text: TriSplit,
+    pub check_mode: bool,
+}
+
+impl Component for TypeFieldCell {
+    type Message = InteractiveCellMsg;
+    type Properties = TypeFieldCellProps;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self {
+            content: DEFAULT_SELECTION_STRING,
+        }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            InteractiveCellMsg::Update(value) => {
+                if self.content != value {
+                    self.content = value;
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let text = ctx.props().text.clone();
+        let content_changed = ctx.link().callback(move |e: InputEvent| {
+            // TODO Paste Detection here
+            let input: HtmlInputElement = e.target_unchecked_into();
+            InteractiveCellMsg::Update(input.value())
+        });
+
+        let checked_class = check_input(ctx.props().check_mode, self.content.clone(), ctx.props().text.middle.clone());
+
+        // TODO lengthen fields when typed into - https://jsfiddle.net/drq0nz6j/
+        let class = ctx.props().class.clone();
+
+        return html! {
+            <td class={checked_class}> { text.start } <input class={class} type="text" size={5} oninput={content_changed}/> { text.end } </td>
+        }
+    }
+
+}
+
+fn check_input(check_mode: bool, content: String, answer: String) -> &'static str {
+    if check_mode {
+        let content = convert_iso_shorthand(content);
+
+        if content.len() == 0 {
+            return ""; // content == DEFAULT_SELECTION_STRING
+        }
+
+        let content_bytes = content.as_bytes();
+
+        let mut content_start: usize = 0;
+        while content_bytes[content_start] == (32 as u8) {
+            content_start += 1;
+            if content_start == content_bytes.len() {
+                return "";
+            }
+        }
+
+        let mut content_end: usize = content_bytes.len() - 1;
+        while content_bytes[content_end] == (32 as u8) {
+            content_end -= 1;
+        }
+
+        // if content_start >= content_end + 1 { // " content " == DEFAULT_SELECTION_STRING
+        //     return "";
+        // }
+        let answer_bytes = answer.as_bytes();
+        if content_end + 1 - content_start != answer_bytes.len() {
+            return "incorrect_cell";
+        }
+        let mut i: usize = 0;
+        while i < answer_bytes.len() {
+            if content_bytes[i + content_start] != answer_bytes[i] {
+                return "incorrect_cell";
+            }
+            i = i + 1;
+        }
+        return "correct_cell";
+
+    } else {
+        ""
+    }
+
+}
+
+
 // match the description in main.js
 const ISO_MAP: [(&str, &str); 10] = [
     ("aa", "ā"),
@@ -147,10 +237,9 @@ const ISO_MAP: [(&str, &str); 10] = [
     (".l", "ḷ"),
 ];
 
-fn iso_shorthand_equals(shorthand: &String, iso: &String) -> bool {
-    let mut converted = shorthand.clone();
+fn convert_iso_shorthand(mut shorthand: String) -> String {
     for (from, to) in &ISO_MAP {
-        converted = converted.replace(from, to.clone());
+        shorthand = shorthand.replace(from, to.clone());
     }
-    return &converted == iso;
+    shorthand
 }

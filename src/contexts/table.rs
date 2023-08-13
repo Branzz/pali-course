@@ -22,7 +22,7 @@ use yew_router::prelude::*;
 use crate::{get_lessons_json, log_dbg, log_display, log_str};
 use crate::app::empty_html;
 use crate::contexts::{DEFAULT_SELECTION_STRING, DropDownCell, Exercise, ExerciseComponent, ExerciseComponentProps,
-                      Exercises, Lesson, Lessons, SpoilerCell, ThemeContext, ThemeKind, ThemeProvider, Toolbar};
+                      Exercises, Lesson, Lessons, SpoilerCell, TypeFieldCell, ThemeContext, ThemeKind, ThemeProvider, Toolbar};
 use crate::contexts::toolbar::TOOLBAR_HEIGHT;
 use crate::contexts::use_theme;
 use crate::html_if_some;
@@ -144,7 +144,6 @@ impl<T> SetLocation<T> for Vec<Vec<T>> {
 }
 
 pub(crate) struct Table {
-    // pub table: DataTable,
     pub parsed_table: ParsedTable,
     pub location_table: Vec<Vec<Location>>,
     pub input_tracking: Option<InputTracking>,
@@ -220,9 +219,11 @@ impl Component for Table {
         let theme = &ctx.props().theme;
         let table_area = theme.css_class_themed("table-area");
         let table_secondary_classes = theme.css_class_themed("table-secondary");
-        let mut side_options = theme.css_class_themed("side-options");
-        let mut check = table_secondary_classes.clone();
-        check.push_str(" check");
+        let mut side_options_class = theme.css_class_themed("side-options");
+        // let mut check = side_options_class.clone();
+        // check.push_str(" check");
+
+        let check_clicked_class = self.is_checking().then_some(theme.css_class_themed("check_clicked_class"));
 
         let mode_switcher = ctx.link().callback(move |e: Event| {
             let input: HtmlInputElement = e.target_unchecked_into();
@@ -248,21 +249,21 @@ impl Component for Table {
                     // important lesson marker
                 </div>
                 <div class={"filler-center"}>{ self.table_html(ctx) } </div>
-                    <div class={"filler-right"}>
-                        if !disabled {
-                            <select class={side_options} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
-                                <option value="Show"           selected={"Show" == self.mode.to_string().clone()}>            {"Reveal all"} </option>
-                                <option value="HoverReveal"    selected={"HoverReveal" == self.mode.to_string().clone()}>     {"Hover reveal"} </option>
-                                <option value="ClickReveal"    selected={"ClickReveal" == self.mode.to_string().clone()}>     {"Click reveal"} </option>
-                             // <option value="CensorByLetter" selected={"CensorByLetter" == self.mode.to_string().clone()}>  {"Reveal by letter"} </option>
-                                <option value="TypeField"      selected={"TypeField" == self.mode.to_string().clone()}>       {"Enter text"} </option>
-                                <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()} disabled={self.options_style == OptionsStyle::Disabled}> {"Drop down"} </option>
-                            </select>
-                            if self.mode.has_input() {
-                                <button class={check} onclick={check_answers}> {"check"} </button>
-                            }
+                <div class={"filler-right table-right"}>
+                    if !disabled {
+                        if self.mode.has_input() {
+                            <button class={classes!(side_options_class.clone(), "check", check_clicked_class)} onclick={check_answers}> {"check"} </button>
                         }
-                    </div>
+                        <select class={side_options_class} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
+                            <option value="Show"           selected={"Show" == self.mode.to_string().clone()}>            {"Reveal all"} </option>
+                            <option value="HoverReveal"    selected={"HoverReveal" == self.mode.to_string().clone()}>     {"Hover reveal"} </option>
+                            <option value="ClickReveal"    selected={"ClickReveal" == self.mode.to_string().clone()}>     {"Click reveal"} </option>
+                         // <option value="CensorByLetter" selected={"CensorByLetter" == self.mode.to_string().clone()}>  {"Reveal by letter"} </option>
+                            <option value="TypeField"      selected={"TypeField" == self.mode.to_string().clone()}>       {"Enter text"} </option>
+                            <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()} disabled={self.options_style == OptionsStyle::Disabled}> {"Drop down"} </option>
+                        </select>
+                    }
+                </div>
             </div>
         }
     }
@@ -270,6 +271,17 @@ impl Component for Table {
 }
 
 impl Table {
+
+    fn is_checking(&self) -> bool {
+        match &self.input_tracking {
+            None => false,
+            Some(i) => i.check_table
+        }
+    }
+
+    fn is_checking_unwrap(&self) -> bool {
+        self.input_tracking.as_ref().unwrap().check_table
+    }
 
     fn table_html(&self, ctx: &Context<Self>) -> Html {
         // let row_indices = (0..self.table.len());
@@ -289,32 +301,41 @@ impl Table {
     fn mediated_cell(&self, location: &Location, _ctx: &Context<Self>) -> Html {
         let cell: ParsedCell = (*self.parsed_table.get(location.0).unwrap().get(location.1).unwrap()).clone();
         let theme = &_ctx.props().theme;
-        let table_secondary_classes = theme.css_class_themed("table-secondary");
+        // let table_secondary_classes = theme.css_class_themed("table-secondary");
         let table_input = theme.css_class_themed("table-input");
 
         match cell {
-            ParsedCell::Label(val) => html! { <td> {val} </td> },
+            ParsedCell::Label(val) => html! { <td> { val } </td> },
             ParsedCell::Interactive(text) => {
                 return match self.mode.clone() {
                     ExerciseMode::Show => html! { <td class={theme.css_class_themed("interactive")}> { text.start }  { text.middle } { text.end } </td> },
                     ExerciseMode::HoverReveal => html! { <td class={theme.css_class_themed("spoilable")}> { text.start } <span class={theme.css_class_themed("spoiler")}> { text.middle } </span> { text.end } </td> },
-                    ExerciseMode::ClickReveal => html! { <SpoilerCell text={text} class={theme.css_class_themed("spoilable")}/> },
+                    ExerciseMode::ClickReveal => html! { <SpoilerCell text={text} class={theme.css_class_themed("spoilable")} /> },
                     ExerciseMode::CensorByLetter => { empty_html() }
-                    // TODO lengthen fields when typed into - https://jsfiddle.net/drq0nz6j/
-                    ExerciseMode::TypeField => html! { <td class={""}> { text.start } <input class={table_input} type="text" size={5}/> { text.end } </td> },
-                    ExerciseMode::DropDown => {
-                        let options = match self.options_style.clone() {
-                            OptionsStyle::Disabled => unreachable!("Accessed drop down when it was disabled"),
-                            OptionsStyle::All { options } => options.clone(),
-                            OptionsStyle::ByCol { col_options } => col_options.get(location.1).unwrap().clone(),
-                        };
+                    ExerciseMode::TypeField | ExerciseMode::DropDown => {
+                        if let Some(key_col) = _ctx.props().table_layout.key_col {
+                            if location.1 == key_col {
+                                return html! { <td> { text.start }  { text.middle } { text.end } </td> }
+                            }
+                        }
 
-                        let check_mode = self.input_tracking.as_ref().unwrap().check_table;
-                        let class = theme.css_class_themed("table-input");
+                        let check_mode = self.is_checking_unwrap();
 
-                        html! { <DropDownCell text={text.clone()} class={table_input} location={location.clone()} options={options} check_mode={check_mode}/> }
+                        match self.mode.clone() {
+                            ExerciseMode::TypeField => html! { <TypeFieldCell text={text} class={table_input} check_mode={check_mode} /> },
+                            ExerciseMode::DropDown => {
+                                let options = match self.options_style.clone() {
+                                    OptionsStyle::Disabled => unreachable!("Accessed drop down when it was disabled"),
+                                    OptionsStyle::All { options } => options.clone(),
+                                    OptionsStyle::ByCol { col_options } => col_options.get(location.1).unwrap().clone(),
+                                };
+
+                                html! { <DropDownCell text={text.clone()} class={table_input} location={location.clone()} options={options} check_mode={check_mode} /> }
+                            }
+                            _ => unreachable!()
+                        }
                     },
-                    ExerciseMode::Disabled => { log_display(text.middle); html!{} } ,
+                    ExerciseMode::Disabled => unreachable!("creating disabled exercise mode"),
                 }
             }
         }

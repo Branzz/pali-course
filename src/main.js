@@ -114,7 +114,7 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Final",
-            "info": "Click the sun/moon on the top right to switch to dark/light mode. Click the arrow on the top right to go to the first lesson."
+            "info": "You can also press TAB to switch typing/drop down between cells. Click the sun/moon on the top right to switch to dark/light mode. Click the arrow on the top right to go to the first lesson."
         }
     ]
 },
@@ -155,6 +155,7 @@ const lessons = // { "courses": [...]}
         {
             "title": "Conjugate Bhū",
             "info": "The conjugations for a 1st conjugation verb, \"to be\"",
+            "exercise_level": "Important",
             "table_layout": {
                 "table": [
                     ["person", "singular",  "plural"],
@@ -168,24 +169,25 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Verbs",
-            "info": "These belong to the first conjugation.",
+            "info": "These are first conjugation verbs in the 3rd person singular.",
+            "exercise_level": "Important",
             "table_layout": {
                 "table": [
-                    ["root",    "verb",           "meaning"],
-                    ["|kam|",   "|upasaṃkamati|", "|he goes to, approaches|"],
-                    ["|kam|",   "|pakkamati|",    "|he goes away|"],
-                    ["|cu|",    "|cavati|",       "|he dies|"],
-                    ["|jīv|",   "|jīvati|",       "|he lives|"],
-                    ["|pass|",  "|passati|",      "|he sees|"],
-                    ["|pucch|", "|pucchati|",     "|he asks|"],
-                    ["|bandh|", "|bandhati|",     "|he binds|"],
-                    ["|bhās|",  "|bhāsati|",      "|he says, speaks|"],
-                    ["|bhū|",   "|bhavati|",      "|he is, there exists|"],
-                    ["|vad|",   "|vadati|",       "|he says|"],
-                    ["|sīd|",   "|nisīdati|",     "|he sits (down)|"],
-                    ["|har|",   "|harati|",       "|he takes|"],
-                    ["|har|",   "|āharati|",      "|he brings|"],
-                    ["|hū|",    "|hoti|",         "|he is, there is|"]
+                    ["root",    "verb",           "meaning (he...)"],
+                    ["|kam|",   "|upasaṃkamati|", "|goes to, approaches|"],
+                    ["|kam|",   "|pakkamati|",    "|goes away|"],
+                    ["|cu|",    "|cavati|",       "|dies|"],
+                    ["|jīv|",   "|jīvati|",       "|lives|"],
+                    ["|pass|",  "|passati|",      "|sees|"],
+                    ["|pucch|", "|pucchati|",     "|asks|"],
+                    ["|bandh|", "|bandhati|",     "|binds|"],
+                    ["|bhās|",  "|bhāsati|",      "|says, speaks|"],
+                    ["|bhū|",   "|bhavati|",      "|is, exists|"],
+                    ["|vad|",   "|vadati|",       "|says|"],
+                    ["|sīd|",   "|nisīdati|",     "|sits (down)|"],
+                    ["|har|",   "|harati|",       "|takes|"],
+                    ["|har|",   "|āharati|",      "|brings|"],
+                    ["|hū|",    "|hoti|",         "|is|"]
                 ],
                 "key_col": 1,
             },
@@ -194,6 +196,7 @@ const lessons = // { "courses": [...]}
         {
             "title": "Vocab",
             "info": "Masculine nouns in -a in the nominative singular.",
+            "exercise_level": "Important",
             "table_layout": {
                 "table": [
                     ["noun",        "meaning"],
@@ -207,11 +210,11 @@ const lessons = // { "courses": [...]}
                     ["|puriso|",    "|man, person|"],
                     ["|brāhmaṇo|",  "|priest, brahman|"],
                     ["|maggo|",     "|road, way|"],
-                    ["|manusso|",   "|human being, person|"],
+                    ["|manusso|",   "|human, person|"],
                     ["|amanusso|",  "|non-human being|"],
                     ["|mahāmatto|", "|minister|"],
-                    ["|loko|",      "|world, people, universe|"],
-                    ["|samaṇo|",    "|ascetic, wanderer, philosopher|"],
+                    ["|loko|",      "|world, people|"],
+                    ["|samaṇo|",    "|ascetic, wanderer|"],
                     ["|samayo|",    "|time, occasion|"]
                 ],
                 "key_col": 0,
@@ -228,22 +231,24 @@ const lessons = // { "courses": [...]}
         {
             "title": "Verbs",
             "info": "These have irregular stems.",
+            "exercise_level": "Important",
             "table_layout": {
                 "table": [
-                    ["root",     "verb",        "meaning"],
-                    ["|vis|",    "|pavisati|",  "|he enters|"],
-                    ["|phus|",   "|phusati|",   "|he touches, reaches, attains|"],
-                    ["|is|",     "|icchati|",   "|he wishes, desires|"],
-                    ["|gam|",    "|gacchati|",  "|he goes|"],
-                    ["|gam|",    "|āgacchati|", "|he comes|"],
-                    ["|(ṭ)ṭhā|", "|tiṭṭhati|",  "|he stands, remains, stays|"],
-                    ["|dā|",     "|deti|",      "|he gives|"],
-                    ["|hā|",     "|pajahati|",  "|he gives up, he renounces|"],
-                    ["|(v)vaj|", "|pabbajati|", "|he goes forth|"],
-                    ["|(j)jhe|", "|jhyāti|",    "|he meditates|"],
-                    ["|i|",      "|eti|",       "|he goes|"],
-                    ["|i|",      "|upeti|",     "|he goes to|"]
+                    ["root",     "verb",        "meaning (he...)"],
+                    ["|vis|",    "|pavisati|",  "|enters|"],
+                    ["|phus|",   "|phusati|",   "|touches, reaches, attains|"],
+                    ["|is|",     "|icchati|",   "|wishes, desires|"],
+                    ["|gam|",    "|gacchati|",  "|goes|"],
+                    ["|gam|",    "|āgacchati|", "|comes|"],
+                    ["|(ṭ)ṭhā|", "|tiṭṭhati|",  "|stands, remains, stays|"],
+                    ["|dā|",     "|deti|",      "|gives|"],
+                    ["|hā|",     "|pajahati|",  "|gives up, renounces|"],
+                    ["|(v)vaj|", "|pabbajati|", "|goes forth|"],
+                    ["|(j)jhe|", "|jhyāti|",    "|meditates|"],
+                    ["|i|",      "|eti|",       "|goes|"],
+                    ["|i|",      "|upeti|",     "|goes to|"]
                 ],
+                "key_col": 1,
             },
             "explanation": "Consonants will become \"assimilated\" with each other like s + ch -> cch",
             "page": 16,
@@ -251,6 +256,7 @@ const lessons = // { "courses": [...]}
         {
             "title": "Cases",
             "info": "This is the form a noun takes when it's a direct object, generally when it's undergoing some action or as an attribute for another accusative object. See the table of stem translations below.",
+            "exercise_level": "Important",
             "table_layout": {
                 "table": [
                     ["stem / case", "-a masc. sing.", "-a masc. plur."],
@@ -263,6 +269,7 @@ const lessons = // { "courses": [...]}
         {
             "title": "Vocab",
             // "info": "Masculine nouns in -a in the nominative singular.",
+            "exercise_level": "Important",
             "table_layout": {
                 "table": [
                     ["|aggo|",   "|top|"],

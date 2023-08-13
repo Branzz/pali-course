@@ -1,6 +1,6 @@
 #![allow(unused_imports)]
 
-pub(crate) use cell::{DEFAULT_SELECTION_STRING, DropDownCell, InteractiveCellProps, SpoilerCell, SpoilerCellProps};
+pub(crate) use cell::{DEFAULT_SELECTION_STRING, DropDownCell, DropDownCellProps, SpoilerCell, SpoilerCellProps, TypeFieldCell};
 pub(crate) use exercise::{Exercise, ExerciseComponent, ExerciseComponentProps};
 pub(crate) use lesson::{Exercises, Lesson, Lessons, use_lessons, LessonsContext, LessonsProvider};
 pub(crate) use table::{ExerciseMode, Table, TableHOC, TableLayout, TriSplit};
