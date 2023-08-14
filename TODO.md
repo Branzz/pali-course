@@ -12,3 +12,4 @@
 * https://yew.rs/docs/concepts/function-components/properties#anti-patterns
 * reset button
 * allow optional titles (linked list iterator of exercises)
+* a sort of classes builder

@@ -12,7 +12,6 @@ pub struct SpoilerCellProps {
     pub theme: ThemeKind,
     pub class: String,
     pub text: TriSplit,
-    pub do_fading: Option<()>,
 }
 
 pub struct SpoilerCell {
@@ -48,15 +47,13 @@ impl Component for SpoilerCell {
 
         let spoil_class = if self.spoiled { "spoiler_button invisible" } else { "spoiler_button visible" };
         let text = ctx.props().text.clone();
-        let mut td_class =
-            if ctx.props().do_fading.is_some() && self.spoiled {
-                ctx.props().theme.css_class_themed("fade-in")
-            } else {
-                ctx.props().class.clone()
-            };
+        let mut td_class = ctx.props().class.clone();
+        td_class.push_str(" clickable");
 
         return html! {
-            <td class={td_class} onmousedown={onclick.clone()}> { text.start } <span class={spoil_class} onmousedown={onclick}> { text.middle } </span> { text.end } </td>
+            <td class={td_class} onmousedown={onclick.clone()}>
+                { text.start } <span class={spoil_class} onmousedown={onclick}> { text.middle } </span> { text.end }
+            </td>
         }
     }
 

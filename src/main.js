@@ -44,7 +44,7 @@ export function get_lessons_json() {
  * Replicate the textbook as close as possible
  * Titles should be short and in Title Case
  * The |markers| don't have to be around the entire cell ("pi |su|kkha")
- * spell Pāli with a capital and ā. Sentences start with capital unless it's Pāli. use the diacritics
+ * spell Pāli with a capital and ā. Sentences start with capital unless it's Pāli. use the diacritics, only use ṃ (to match textbook)
  * The explanation should be something that would spoil the problem when revealed such as a grammar rule
  *   or some sort of exception
  * End every 'fuller' sentence with a period
@@ -107,7 +107,7 @@ const lessons = // { "courses": [...]}
             }
         },
         {
-            "title": "Final",
+            "title": "Finally,",
             "info": "Click the sun/moon on the top right to switch to dark/light mode. Hovering near the title lets you link to the exercise. Click the arrow on the top right to go to the first lesson."
         }
     ]
@@ -118,26 +118,32 @@ const lessons = // { "courses": [...]}
     "exercises": [
         {
             "title": "Long or Short",
-            "info": "Decide whether just the vowel tends towards long or short in speech and whether the entire construction tends towards \"heavy\" or \"light\".",
+            "info": "Decide whether just the vowel tends towards long or short in speech and whether the vowel's syllable tends towards \"long\" or \"short\".",
             "table_layout": {
                 "table": [
-                    ["part",  "vowel length"],
-                    ["bha",   "|short|"     ],
-                    ["ṭā",    "|long|"      ],
-                    ["jjū",   "|short|"     ],
-                    ["tthu",  "|short|"     ],
-                    ["att",   "|short|"     ],
-                    ["ti",    "|short|"     ],
-                    ["ibh",   "|short|"     ],
-                    ["nte",   "|long|"      ],
-                    ["mett",  "|short|"     ],
-                    ["ro",    "|long|"      ],
-                    ["nti",   "|short|"     ],
-                    ["saṃ",   "|short|"     ],
+                    ["part",  "vowel length", "syllable length"],
+                    ["bha",   "|short|",      "|short|"],
+                    ["ṭā",    "|long|",       "|long|"],
+                    ["jjū",   "|long|",       "|long|"],
+                    ["tthu",  "|short|",      "|short|"],
+                    ["att",   "|short|",      "|long|"],
+                    ["aṅgh",  "|short|",      "|long|"],
+                    ["ti",    "|short|",      "|short|"],
+                    ["saṃ",   "|short|",      "|long|"],
+                    ["ibh",   "|short|",      "|short|"],
+                    ["umh",   "|short|",      "|long|"],
+                    ["mett",  "|short|",      "|long|"],
+                    ["ro",    "|long|",       "|long|"],
+                    /* v - vowel, s - short vowel, l - long vowel, c - consonant (including aspirated)
+                     * vcc -> short, long
+                     * vṃ -> short, long
+                     * sc -> short, short
+                     * lc -> long, long
+                     */
                 ],
                 "default_mode": "DropDown",
             },
-            "explanation": "e and o are long unless before double consonant",
+            "explanation": "e and o are long. Vowels are short if before double asp./unasp. consonant or ṃ. mh isn't a consonant.",
             "page": 4,
         }
     ]

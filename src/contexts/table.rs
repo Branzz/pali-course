@@ -132,18 +132,14 @@ impl Component for Table {
         // check.push_str(" check");
 
         let check_clicked_class = self.is_checking().then_some(theme.css_class_themed("check_clicked_class"));
-
         let mode_switcher = ctx.link().callback(move |e: Event| {
             let input: HtmlInputElement = e.target_unchecked_into();
             ExerciseMode::from_str(input.value().as_str()).ok()
                 .map(TableMsg::SwitchMode)
                 .unwrap_or(TableMsg::Error)
         });
-
         let check_answers = ctx.link().callback(move |_: MouseEvent| TableMsg::CheckClicked);
-
         let reset = ctx.link().callback(move |_: MouseEvent| TableMsg::Reset);
-
         let disabled = self.mode == ExerciseMode::Disabled;
 
         let html = html! {
@@ -155,9 +151,9 @@ impl Component for Table {
                 <div class="filler-right table-right">
                     if !disabled {
                         if self.mode.has_input() {
-                            <button class={classes!(side_options_class.clone(), "check", check_clicked_class.clone())} onclick={check_answers}> {"check"} </button>
+                            <button class={classes!(side_options_class.clone(), "side-button", check_clicked_class.clone())} onclick={check_answers}> {"check"} </button>
                         }
-                        <select class={side_options_class.clone()} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
+                        <select class={classes!(side_options_class.clone(), "clickable")} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
                             <option value="Show"           selected={"Show" == self.mode.to_string().clone()}>            {"Reveal all"} </option>
                             <option value="HoverReveal"    selected={"HoverReveal" == self.mode.to_string().clone()}>     {"Hover reveal"} </option>
                             <option value="ClickReveal"    selected={"ClickReveal" == self.mode.to_string().clone()}>     {"Click reveal"} </option>
@@ -166,7 +162,7 @@ impl Component for Table {
                             <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()} disabled={self.options_style == DropDownOptionsStyle::Disabled}> {"Drop down"} </option>
                         </select>
                         if self.mode.is_resettable() {
-                            <button class={classes!(side_options_class, "check")} onclick={reset}> {"↺"} </button>
+                            <button class={classes!(side_options_class, "side-button")} onclick={reset}> {"↺"} </button>
                         }
                     }
                 </div>

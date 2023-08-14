@@ -12,7 +12,7 @@ use yew_router::prelude::*;
 
 use crate::{html_if_some, log_display, log_str};
 use crate::app::{empty_html, Route};
-use crate::contexts::{ThemeContext, use_theme, TriSplit};
+use crate::contexts::{ThemeContext, use_theme, TriSplit, ThemeKind};
 use crate::contexts::{Table, TableLayout};
 use crate::contexts::table::ExerciseMode;
 use crate::contexts::{SpoilerCell, SpoilerCellProps};
@@ -107,11 +107,11 @@ pub(crate) fn exercise_component(props: &ExerciseComponentProps) -> Html {
     let info = html_if_some(props.exercise.info.clone(), |info| html! { <div class="flexer"> <p class="info">{ info } </p> </div> });
     let table = html_if_some(props.exercise.table_layout.clone(), |table_layout| html!{ <Table key={table_id} table_layout={table_layout.clone()} theme={theme.kind.clone()} id={id_str.clone()}/> });
     let explanation = html_if_some(props.exercise.explanation.clone(), |explanation| {
-        let split = TriSplit { start: "".to_string(), middle: explanation, end: "".to_string() };
-        let explanation_class = theme.kind.css_class_themed("table-secondary");
+        let mut explanation_class = theme.kind.css_class_themed("");
+        explanation_class.push_str(" explanation");
          html! {
              <div class="flexer">
-                 <p class="info"> <SpoilerCell text={split} class={explanation_class} theme={theme.kind()} do_fading={Some(())} /> </p>
+                 <p class="info"> <Explanation text={explanation} class={explanation_class} theme={theme.kind()} /> </p>
              </div>
          }});
     let page = html_if_some(props.exercise.page.clone(), |page: i32| {
@@ -151,4 +151,52 @@ impl FromStr for ExerciseLevel {
             _ =>            Ok(ExerciseLevel::Regular),
         }
     }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct ExplanationProps {
+    pub theme: ThemeKind,
+    pub text: String,
+    pub class: String,
+}
+
+pub struct Explanation {
+    spoiled: bool,
+}
+
+pub enum ExplanationMsg {
+    FlipState,
+}
+
+impl Component for Explanation {
+    type Message = ExplanationMsg;
+    type Properties = ExplanationProps;
+
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self { spoiled: true }
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            ExplanationMsg::FlipState => { self.spoiled = !self.spoiled; true },
+        }
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let onclick = ctx.link().callback(move |_e: MouseEvent| {
+            ExplanationMsg::FlipState
+        });
+
+        let spoil_class = if self.spoiled { "spoiler_button invisible" } else { "spoiler_button visible" };
+        let text = ctx.props().text.clone();
+        let mut outer_class = ctx.props().theme.css_class_themed(if self.spoiled { "fade-in" } else { "table-secondary" });
+        outer_class.push_str(" explanation");
+
+        return html! {
+            <div class={outer_class} onmousedown={onclick.clone()}>
+                <span class={spoil_class} onmousedown={onclick}> { text } </span>
+            </div>
+        }
+    }
+
 }

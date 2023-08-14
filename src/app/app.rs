@@ -183,7 +183,7 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                 <span>{"I'll keep this "}</span>
                 <a class="linked" target="_blank" href="https://github.com/Branzz/pali-course">{"open source"}</a>
                 <span>{". The lessons are stored in an intuitive "}</span>
-                <a class="linked" target="_blank" href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L48">{"json format"}</a>
+                <a class="linked" target="_blank" href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L66">{"json format"}</a>
                 <span>{", so it would be easy to contribute to that. Most of this isn't hard-coded, so one could clone this and easily use the format for learning anything else."}</span>
                 <br/>
                 <h2> { "Features" } </h2>
@@ -219,6 +219,7 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                 <h3> <a target="_blank" href={ "https://www.youtube.com/@BAUSChuangYenMonastery" }>{"Chuang Yen"}</a> </h3>
                 <h3> <a target="_blank" href={ "https://www.ancient-buddhist-texts.net/Textual-Studies/Grammar/Guide-to-Pali-Grammar.htm" }>{"Rigid grammar guide"}</a> </h3>
                 <h3> <a target="_blank" href={ "https://www.digitalpalireader.online/_dprhtml/index.html" }>{"Digital Pali Reader"}</a> </h3>
+                <h3> <a target="_blank" href={ "https://audtip.org/misc/paligor/ref/index.html" }>{"Verb roots"}</a> </h3>
                <h3 class="spaced"> <a target="_blank" href={ "https://www.clearmountainmonastery.org/2020/08/01/article-a-fun-way-to-memorize-long-dhamma-with-a-special-focus-on-the-dhammapada/" }>{"Memorizing"}</a> </h3>
             </div>
             <div class="flexer"><p>{ "Chart of sounds in the mouth (bottom ones don't happen)" }</p></div>

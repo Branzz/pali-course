@@ -177,11 +177,18 @@ table, th, td {
     padding: 4px 6px;
     border: 1px solid;
     white-space: nowrap;
-
 }
 
 /*td {*/
 /*    padding-left: 4px;*/
+/*}*/
+
+.clickable {
+    cursor: pointer;
+}
+
+/*.clickable:hover {*/
+/*    cursor: pointer;*/
 /*}*/
 
 .spoilable--dark,
@@ -259,7 +266,7 @@ select, .table-input {
     padding-left: 2px;
 }
 
-.check {
+.side-button {
     font-family: "Skolar Sutta Web", serif;
     font-size: 16px;
     border: 1px solid;
@@ -271,11 +278,11 @@ select, .table-input {
 }
 
 .check_clicked_class--dark {
-    background-color: #111121;
+    background-color: #4d4445;
 }
 
 .check_clicked_class--light {
-    background-color: #d2c7c7;
+    background-color: #c6c8d0;
 }
 
 .table-secondary {}
@@ -319,9 +326,13 @@ option {
     font-style: italic;
 }
 
-.explanation { }
+.explanation {
+    border-width: 1px;
+    border-style: solid;
+    padding: 4px;
+}
 
-.check:hover {
+.side-button:hover {
     cursor: pointer;
 }
 
@@ -350,9 +361,8 @@ option {
 }
 
 .fade-in {
+    border-width: 1px;
+    border-style: solid;
     transition: 0.1s ease-in-out;
-}
-
-.fade-in:hover {
     cursor: help;
 }
