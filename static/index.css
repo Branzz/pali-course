@@ -15,7 +15,6 @@ body {
 }
 
 /*.linked {*/
-
 /*}*/
 
 a:link, a:visited {
@@ -28,7 +27,6 @@ a:link, a:visited {
     width: 100%;
     text-align: center;
 }
-
 
 .spaced {
     margin-bottom: 50px;
@@ -44,6 +42,11 @@ a:link, a:visited {
     width: 32px;
     text-align: center;
     position: relative;
+}
+
+.top-button a {
+    width: 32px;
+    display: block;
 }
 
 .top-button--dark {
@@ -64,7 +67,6 @@ a:link, a:visited {
 .top-button--light a {
     color: #fff6f1 !important;
 }
-
 
 .stretched {
     width: 100%;
@@ -111,13 +113,23 @@ a:link, a:visited {
     border-radius: 2px;
 }
 
+.preserved {
+    image-rendering: pixelated;
+}
+
 .exercise-link-zone:hover > .filler-right > div {
     visibility: visible;
 }
 
-
 li {
     margin-left: 25px;
+}
+
+.extend {
+    width: 100%;
+    /*width: -moz-available;*/
+    /*width: -webkit-fill-available;*/
+    /*width: stretch;*/
 }
 
 .table-area {
@@ -146,6 +158,10 @@ li {
     width: 50%;
 }
 
+.filler-table {
+    /*overflow-x: scroll;*/
+}
+
 .table-right {
     margin-left: 6px;
     display: grid;
@@ -163,6 +179,10 @@ table, th, td {
     white-space: nowrap;
 
 }
+
+/*td {*/
+/*    padding-left: 4px;*/
+/*}*/
 
 .spoilable--dark,
 .table-secondary--dark,
@@ -207,7 +227,12 @@ table, th, td {
 
 .visible {}
 
-.table-input {}
+.table-input {
+}
+
+.type-field {
+    /*width: calc(100% - 4px);*/
+}
 
 .correct_cell {
     background-color: lightgreen;
@@ -223,7 +248,7 @@ table, th, td {
     display: inline-table;
     margin-left: 10px;
     margin-bottom: 16px;
-    padding-bottom: 2px;
+    padding-bottom: 1px;
     padding-right: 4px;
 }
 
@@ -289,24 +314,45 @@ option {
 }
 
 .ref {
-    font-size: 14pt;
+    font-size: 12pt;
     display: block;
     font-style: italic;
 }
 
 .explanation { }
 
-.check:hover{
+.check:hover {
     cursor: pointer;
 }
 
+.fade-in--dark {
+    color: white;
+    border-color: #514743;
+    background-color: #16161f;
+}
+
+.fade-in--light {
+    color: #4e4e4e;
+    border-color: #8d9198;
+    background-color: #eef1f8;
+}
+
+.fade-in--dark:hover {
+    color: white;
+    border-color: #b39a89;
+    background-color: #202031;
+}
+
+.fade-in--light:hover {
+    color: black;
+    border-color: black;
+    background-color: #f0eeee;
+}
 
 .fade-in {
     transition: 0.1s ease-in-out;
-    opacity: 0.4;
 }
 
 .fade-in:hover {
-    opacity: 1;
     cursor: help;
 }

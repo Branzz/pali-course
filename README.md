@@ -1,9 +1,6 @@
 
 This is the website made for learning pali from Bhante Sujato's Pali Course 2023
 
-Made in Yew (transpiled to WebAssembly)
-
-
 ### Website features
 * dark mode
 

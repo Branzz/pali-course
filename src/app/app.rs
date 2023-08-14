@@ -7,7 +7,7 @@ use stylist::yew::{Global, styled_component};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{get_lessons_json, log_str};
+use crate::{get_lessons_json, log_str, log_display, log_dbg};
 use crate::contexts::{Exercise, ExerciseComponent, Exercises, Lesson, Lessons, ThemeContext,
                       ThemeProvider, Toolbar, use_theme, use_lessons, LessonsContext, LessonsProvider};
 use std::ops::Deref;
@@ -167,67 +167,77 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
     match props.route.clone() {
         Route::RedirectFromHome => html! { <Redirect<Route> to={Route::Overview} /> },
         Route::Overview => content_titled(String::from("Overview"), None, html! { <>
-            <div class={"info"}>
+            <div class="info">
                 <span>{"This is an interactive format from "}</span>
                 <a class="linked" target="_blank" href="https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up">{"Introduction To Pali by A.K. Warder."}</a>
-                <h2 class="linked" > <Link<Route> to={Route::Lessons}>{ "View Lessons" }</Link<Route>> </h2>
-                <span>{"This may not necessarily be correct, so please tell me any errors "}</span>
+                <br/>
+                <br/>
+                <span>{"This may not necessarily be correct, so please tell me any errors by messaging me "}</span>
                 <a class="linked" href="https://discourse.suttacentral.net/u/bran">{"here"}</a>
                 <span>{r#" or even any suggestions at all.
-                            This is definitely a work-in-progress, so not every lesson is as full as I'd like.
+                            This is still a work-in-progress, so not every lesson is necessarily complete.
                             You can use this to memorize vocab, familiazize yourself, or quiz knowledge to track progression.
                             You should firstly look through the tutorial and options."#}</span>
-                <h3> <Link<Route> to={Route::LearningResources}>{ "Other Resources" }</Link<Route>></h3>
+                <br/>
+                <h2 class="linked" > <Link<Route> to={Route::Lessons}>{ "View Lessons" }</Link<Route>> </h2>
                 <span>{"I'll keep this "}</span>
                 <a class="linked" target="_blank" href="https://github.com/Branzz/pali-course">{"open source"}</a>
-                <span>{". If you'd like to contribute somehow, this was made in Yew (React-like) in Rust, transpiled to WebAssembly."}</span>
-                <br/>
-                <br/>
-                <span>{"The lessons are stored in an intuitive "}</span>
+                <span>{". The lessons are stored in an intuitive "}</span>
                 <a class="linked" target="_blank" href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L48">{"json format"}</a>
-                <span>{", however, so it would be easy to add to that. Most of this isn't hard-coded, so one could clone this and easily use the format for learning anything else."}</span>
+                <span>{", so it would be easy to contribute to that. Most of this isn't hard-coded, so one could clone this and easily use the format for learning anything else."}</span>
                 <br/>
                 <h2> { "Features" } </h2>
             </div>
-            <div class={"flex-surround"}>
-                <ul class={"boxxy"}>
+            <div class="flex-surround">
+                <ul class="boxxy">
                     <h3> { "Completed" } </h3>
                     <li> { "Framework for lesson creation" } </li>
-                    <li> { "Several exercise modes" } </li>
+                    <li> { "Exercise modes" } </li>
                     <li> { "Dark/Light theme" } </li>
                 </ul>
-                <ul class={"boxxy"}>
+                <ul class="boxxy">
                     <h3> { "In-progress" } </h3>
                     <li> { "Tutorial, Lessons 1-2" } </li>
                     <li> { "Reveal-by-letter mode" } </li>
                     <li> { "Mobile friendly (mouse-hover, reactive)" } </li>
                 </ul>
-                <ul class={"boxxy"}>
-                    <h3> { "Planned / other ideas" } </h3>
+                <ul class="boxxy">
+                    <h3> { "Planned / Other ideas" } </h3>
                     <li> { "Lessons 3+" } </li>
                     <li> { "Shuffle rows" } </li>
+                    <li> { "Show the lesser definitions" } </li>
+                    <li> { "Lesson 'types' section ('Verb', 'Conjugations'...)" } </li>
                 </ul>
             </div>
-        </> }),
+            <h3> <Link<Route> to={Route::LearningResources}>{ "Other Resources" }</Link<Route>></h3>
+       </> }),
         Route::LearningResources => content_titled(String::from("Resources"), Some(Route::Overview), html! { <>
-            <div class={"info"}>
-                <p class={"spaced"}>{ "Some links I have compiled along with some things I have made" }</p>
+            <div class="info">
+                <div class="flexer"><p class="spaced">{ "Some links I have compiled along with some things I have made" }</p></div>
                 <h3> <a target="_blank" href={ "https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up" }>{"Warder"}</a> </h3>
+                <h3> <a target="_blank" href={ "https://app.memrise.com/course/910937/pali-ak-warder-vocabulary/" }>{"Similar Site"}</a> </h3>
+                <h3> <a target="_blank" href={ "https://www.youtube.com/@BAUSChuangYenMonastery" }>{"Chuang Yen"}</a> </h3>
                 <h3> <a target="_blank" href={ "https://www.ancient-buddhist-texts.net/Textual-Studies/Grammar/Guide-to-Pali-Grammar.htm" }>{"Rigid grammar guide"}</a> </h3>
                 <h3> <a target="_blank" href={ "https://www.digitalpalireader.online/_dprhtml/index.html" }>{"Digital Pali Reader"}</a> </h3>
-                <h3 class={"spaced"}> <a target="_blank" href={ "https://www.clearmountainmonastery.org/2020/08/01/article-a-fun-way-to-memorize-long-dhamma-with-a-special-focus-on-the-dhammapada/" }>{"Memorizing"}</a> </h3>
+               <h3 class="spaced"> <a target="_blank" href={ "https://www.clearmountainmonastery.org/2020/08/01/article-a-fun-way-to-memorize-long-dhamma-with-a-special-focus-on-the-dhammapada/" }>{"Memorizing"}</a> </h3>
             </div>
-            <div class={"centered"}> <img src="/phoen.png" /> </div>
-            <div class={"centered"}> <img src="/sandhi.png" /> </div>
+            <div class="flexer"><p>{ "Chart of sounds in the mouth (bottom ones don't happen)" }</p></div>
+            <div class="centered preserved"> <img src="/phoen.png" /> </div>
+            <div class="centered preserved"> <img src="/sandhi.png" /> </div>
+            <div class="centered preserved"> <img src="/12.png" /> </div>
         </> }),
         Route::Lessons => {
-            content_titled(String::from("Lessons"), Some(Route::Overview), html! {
-                <div class={"listed-info wide-text"}>
+            content_titled(String::from("Lessons"), Some(Route::Overview), html! { <>
+                <br/>
+                <div class="listed-info wide-text">
                     { for lessons.lessons.iter().map(|lesson| html! {
                         <Link<Route> to={Route::Lesson {path: lesson.path.clone()}}> { lesson.name.clone() } </Link<Route>>
                     }) }
+                    // Grammar, Verbs, Vocab
+
+
                 </div>
-            })
+            </>})
         },
         Route::RedirectToLesson  { path } => html! { <Redirect<Route> to={Route::Lesson {path: path}} /> },
         Route::RedirectToLesson2 { path } => html! { <Redirect<Route> to={Route::Lesson {path: path}} /> },

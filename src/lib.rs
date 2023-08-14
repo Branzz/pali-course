@@ -63,8 +63,8 @@ extern "C" {
 
 #[wasm_bindgen(module = "/src/main.js")]
 extern "C" {
-    #[wasm_bindgen(js_name = call)]
-    fn call();
+    #[wasm_bindgen(js_name = getTextWidth)]
+    fn get_text_width(e: JsValue) -> i32;
 
     #[wasm_bindgen(js_name = prefersDarkScheme)]
     fn prefers_dark_scheme() -> bool;

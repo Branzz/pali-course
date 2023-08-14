@@ -11,28 +11,20 @@ export async function sleep(duration) {
     await new Promise(r => setTimeout(r, duration));
 }
 
-export function call() {
-
-    var params = {
-
-    };
-
-    let arg = "";
-    let result =
-       fetch_with_timeout("https://..." + arg, {
-            headers: {
-                'Content-Type': "application/json",
-            },
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify(params)
-        })
-        .then(response => response.json())
-        .then(response => {
-            console.log("fetching");
-        })
-        .catch(error => { });
+/**
+ * returns the width of child text of any DOM node as a float
+ */
+function getTextWidth(e) {
+    const canvas = getTextWidth.canvas || (getTextWidth.canvas = document.createElement("canvas"));
+    const context = canvas.getContext("2d");
+    const font = window.getComputedStyle(e, null).getPropertyValue('font');
+    const text = e.value;
+    context.font = font;
+    const textMeasurement = context.measureText(text);
+    return textMeasurement.width;
 }
+
+
 
 export function prefersDarkScheme() {
     return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
@@ -47,10 +39,12 @@ export function get_lessons_json() {
 /**
  * Basic Guide
  *
+ * names and titles MUST be unique
+ *
  * Replicate the textbook as close as possible
  * Titles should be short and in Title Case
  * The |markers| don't have to be around the entire cell ("pi |su|kkha")
- * spell Pāli with a capital and ā
+ * spell Pāli with a capital and ā. Sentences start with capital unless it's Pāli. use the diacritics
  * The explanation should be something that would spoil the problem when revealed such as a grammar rule
  *   or some sort of exception
  * End every 'fuller' sentence with a period
@@ -77,7 +71,7 @@ const lessons = // { "courses": [...]}
     "exercises": [
         {
             "title": "Layout",
-            "info": "Here's an exercise with the answers covered. Click on them to reveal one-by-one. Then, see the drop down for the other modes. Some let you check your answers.",
+            "info": "Here's an exercise with the answers covered. Click on them to reveal one-by-one. Then, see the drop down for the other modes. Some let you check your answers. You can also press TAB to switch typing/drop down between cells.",
             "table_layout": {
                 "table": [
                     ["Eng",  "Pāli"  ],
@@ -94,8 +88,8 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Input Method",
-            // The star here means it's an important lesson (some exercises are less useful details, while some are more valuable to learning Pāli)
-            "info": "Here are the alternate ways to type the accented Pāli characters on this site.",
+            "exercise_level": "Important",
+            "info": "Here are the alternate ways to type the accented Pāli characters on this site. The star means that this is an \"important\" exercise (some exercises are less useful details, while some are more valuable to learning Pāli)",
             "table_layout": {
                 // match the const in cell.rs
                 "table": [
@@ -114,7 +108,7 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Final",
-            "info": "You can also press TAB to switch typing/drop down between cells. Click the sun/moon on the top right to switch to dark/light mode. Click the arrow on the top right to go to the first lesson."
+            "info": "Click the sun/moon on the top right to switch to dark/light mode. Hovering near the title lets you link to the exercise. Click the arrow on the top right to go to the first lesson."
         }
     ]
 },
@@ -246,7 +240,7 @@ const lessons = // { "courses": [...]}
                     ["|(v)vaj|", "|pabbajati|", "|goes forth|"],
                     ["|(j)jhe|", "|jhyāti|",    "|meditates|"],
                     ["|i|",      "|eti|",       "|goes|"],
-                    ["|i|",      "|upeti|",     "|goes to|"]
+                    ["|i|",      "|upeti|",     "|goes|"]
                 ],
                 "key_col": 1,
             },
@@ -260,8 +254,8 @@ const lessons = // { "courses": [...]}
             "table_layout": {
                 "table": [
                     ["stem / case", "-a masc. sing.", "-a masc. plur."],
-                    ["nom.", "|-o|",  "|-ā|"],
-                    ["acc.", "|-aṃ|", "|-e|"],
+                    ["nom.", "-|o|",  "-|ā|"],
+                    ["acc.", "-|aṃ|", "-|e|"],
                 ],
             },
             "page": 17,
@@ -324,5 +318,12 @@ const lessons = // { "courses": [...]}
 //
 //     ]
 // },
+
+//     {
+//         "title": "anonymous",
+//         "exercises": [
+//
+//         ]
+//     }
 
 ]}

@@ -5,7 +5,6 @@ import copy from 'rollup-plugin-copy';
 import resolve from '@rollup/plugin-node-resolve';
 // import { wasm  } from '@rollup/plugin-wasm';
 
-// TODO [no_mangle]
 const is_watch = !!process.env.ROLLUP_WATCH;
 
 export default {

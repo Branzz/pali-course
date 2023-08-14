@@ -13,7 +13,7 @@ use yew_router::prelude::*;
 use crate::{html_if_some, log_display, log_str};
 use crate::app::{empty_html, Route};
 use crate::contexts::{ThemeContext, use_theme, TriSplit};
-use crate::contexts::{Table, TableLayout, TableHOC};
+use crate::contexts::{Table, TableLayout};
 use crate::contexts::table::ExerciseMode;
 use crate::contexts::{SpoilerCell, SpoilerCellProps};
 
@@ -31,7 +31,7 @@ pub struct Exercise {
 impl Exercise {
 
     pub fn effective_path(&self) -> String {
-        // TODO .map(|mut t: String| {t.remove_matches(|c: char| c.is_whitespace()); t})
+        // .map(|mut t: String| {t.remove_matches(|c: char| c.is_whitespace()); t})
         self.path.clone().or(self.title.clone()).unwrap_or("404".to_string())
     }
 
@@ -41,7 +41,7 @@ impl Exercise {
 #[derive(Properties, PartialEq)]
 pub struct ExerciseComponentProps {
     pub lesson_path: Option<String>,
-    pub exercise: Exercise, // TODO flatten to just Exercise ?
+    pub exercise: Exercise,
 }
 
 #[styled_component(ExerciseComponent)]
@@ -99,21 +99,28 @@ pub(crate) fn exercise_component(props: &ExerciseComponentProps) -> Html {
             </div>
         </div>
     });
+
+    let id_str = format!("{}-{}", props.lesson_path.clone().unwrap_or("anon".to_string()), props.exercise.title.clone().unwrap_or("anon".to_string()));
+    let table_id = id_str.as_str();
+
+    // log_display(props.exercise.table_layout.clone().unwrap().table.get(0).unwrap().get(0).unwrap());
     let info = html_if_some(props.exercise.info.clone(), |info| html! { <div class="flexer"> <p class="info">{ info } </p> </div> });
-    let table = html_if_some(props.exercise.table_layout.clone(), |table_layout| html!{ <Table theme={theme.kind.clone()} table_layout={table_layout.clone()} /> });
+    let table = html_if_some(props.exercise.table_layout.clone(), |table_layout| html!{ <Table key={table_id} table_layout={table_layout.clone()} theme={theme.kind.clone()} id={id_str.clone()}/> });
     let explanation = html_if_some(props.exercise.explanation.clone(), |explanation| {
         let split = TriSplit { start: "".to_string(), middle: explanation, end: "".to_string() };
         let explanation_class = theme.kind.css_class_themed("table-secondary");
          html! {
              <div class="flexer">
-                 <p class="info"> <SpoilerCell text={split} class={explanation_class} do_fading={Some(())}/> </p>
+                 <p class="info"> <SpoilerCell text={split} class={explanation_class} theme={theme.kind()} do_fading={Some(())} /> </p>
              </div>
          }});
     let page = html_if_some(props.exercise.page.clone(), |page: i32| {
         let ref_link = format!("https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/page/n{}/mode/1up", page + 13); // preface offset
         let hover_text = format!("Warder p. {}", page);
         html! {
-            <a class={"ref centered"} href={ref_link} title={hover_text} target="_blank"> {"Reference"} </a>
+            <div class="flexer">
+                <a class="ref" href={ref_link} title={hover_text} target="_blank"> {"Reference"} </a>
+            </div>
         }
     });
 

@@ -3,12 +3,13 @@ use yew::{Component, Context, Html, html, Properties};
 use yew::prelude::*;
 use std::collections::HashMap;
 
-use crate::{log, log_display, log_js};
+use crate::{log, log_display, log_js, get_text_width};
 use crate::contexts::table::{InputTracking, Location};
-use crate::contexts::TriSplit;
+use crate::contexts::{TriSplit, ThemeKind};
 
 #[derive(Properties, PartialEq)]
 pub struct SpoilerCellProps {
+    pub theme: ThemeKind,
     pub class: String,
     pub text: TriSplit,
     pub do_fading: Option<()>,
@@ -47,10 +48,12 @@ impl Component for SpoilerCell {
 
         let spoil_class = if self.spoiled { "spoiler_button invisible" } else { "spoiler_button visible" };
         let text = ctx.props().text.clone();
-        let mut td_class = ctx.props().class.clone();
-        if ctx.props().do_fading.is_some() && self.spoiled {
-            td_class.push_str(" fade-in");
-        }
+        let mut td_class =
+            if ctx.props().do_fading.is_some() && self.spoiled {
+                ctx.props().theme.css_class_themed("fade-in")
+            } else {
+                ctx.props().class.clone()
+            };
 
         return html! {
             <td class={td_class} onmousedown={onclick.clone()}> { text.start } <span class={spoil_class} onmousedown={onclick}> { text.middle } </span> { text.end } </td>
@@ -74,12 +77,12 @@ pub struct DropDownCell {
     pub selected: String,
 }
 
-pub enum InteractiveCellMsg {
+pub enum DropDownCellMsg {
     Update(String)
 }
 
 impl Component for DropDownCell {
-    type Message = InteractiveCellMsg;
+    type Message = DropDownCellMsg;
     type Properties = DropDownCellProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
@@ -90,7 +93,7 @@ impl Component for DropDownCell {
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            InteractiveCellMsg::Update(value) => { self.selected = value; true }
+            DropDownCellMsg::Update(value) => { self.selected = value; true }
         }
     }
 
@@ -100,7 +103,7 @@ impl Component for DropDownCell {
 
         let dropdown_changed = ctx.link().callback(move |e: Event| {
             let input: HtmlInputElement = e.target_unchecked_into();
-            InteractiveCellMsg::Update(input.value())
+            DropDownCellMsg::Update(input.value())
         });
 
         let checked_class = check_input(ctx.props().check_mode, self.selected.clone(), ctx.props().text.middle.clone());
@@ -124,31 +127,38 @@ impl Component for DropDownCell {
 
 pub struct TypeFieldCell {
     pub content: String,
+    pub width: i32,
 }
-
 
 #[derive(Properties, PartialEq)]
 pub struct TypeFieldCellProps {
     pub class: String,
     pub text: TriSplit,
     pub check_mode: bool,
+    pub size: i32,
+}
+
+pub enum TypeFieldCellMsg {
+    Update(String, i32)
 }
 
 impl Component for TypeFieldCell {
-    type Message = InteractiveCellMsg;
+    type Message = TypeFieldCellMsg;
     type Properties = TypeFieldCellProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
             content: DEFAULT_SELECTION_STRING,
+            width: 20,
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            InteractiveCellMsg::Update(value) => {
+            TypeFieldCellMsg::Update(value, width) => {
                 if self.content != value {
                     self.content = value;
+                    self.width = width;
                     true
                 } else {
                     false
@@ -159,19 +169,39 @@ impl Component for TypeFieldCell {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let text = ctx.props().text.clone();
-        let content_changed = ctx.link().callback(move |e: InputEvent| {
-            // TODO Paste Detection here
+
+        let paste = ctx.link().callback(move |e: Event| {
             let input: HtmlInputElement = e.target_unchecked_into();
-            InteractiveCellMsg::Update(input.value())
+            log_display("p");
+            let text_width: i32 = 0; // get_text_width(input.target);
+            // input.set_length()
+
+            TypeFieldCellMsg::Update(input.value(), text_width)
         });
+
+
+        let content_changed = ctx.link().callback(move |e: InputEvent| {
+            let input: HtmlInputElement = e.target_unchecked_into();
+
+            log_display("c");
+            let text_width: i32 = 0; // get_text_width(input); // TODO
+
+            TypeFieldCellMsg::Update(input.value(), text_width)
+        });
+
+        // let width: String = format!("{}px", self.width + 4);
 
         let checked_class = check_input(ctx.props().check_mode, self.content.clone(), ctx.props().text.middle.clone());
 
         // TODO lengthen fields when typed into - https://jsfiddle.net/drq0nz6j/
         let class = ctx.props().class.clone();
 
+        let size = ctx.props().size.to_string();
+
         return html! {
-            <td class={checked_class}> { text.start } <input class={class} type="text" size={5} oninput={content_changed}/> { text.end } </td>
+            <td class={checked_class}> { text.start }
+                <input type="text" class={class} oninput={content_changed} onpaste={paste} size={size} /> { text.end } // onchange will wait until cell unfocused
+            </td>
         }
     }
 
