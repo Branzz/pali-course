@@ -36,7 +36,7 @@ a:link, a:visited {
     text-align: center;
     margin-top: 3px;
     width: 1600px; // twice width as content
-    color: #f0eee8;
+color: #f0eee8;
     white-space: nowrap;
 }
 
@@ -381,18 +381,42 @@ option {
         display: unset;
     }
     .boxxy {
-        margin: 0 20px 25px !important;
+        margin: 0 10px 25px !important;
     }
 }
 
 @media only screen and (max-width: 700px) {
+    body {
+        overflow-x: scroll !important;
+    }
+    .main {
+        width: 100vw !important;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .top-title {
+        font-size: 22px !important;
+        flex: 1;
+        top: 37px;
+        position: absolute;
+        background-color: gray;
+        line-height: normal !important;
+        width: 100%;
+    }
     .table-right {
         margin-top: 15px;
-        /*flex: 2;*/
     }
     .table-area {
         flex-direction: column;
-
+    }
+    .filler-table {
+        overflow-x: auto !important;
+        width: auto !important;
+        float: left;
+        left: 0;
+        align-self: normal;
+        margin-left: 4px;
+        font-size: 17px;
     }
     .check {
         font-size: 20px !important;
@@ -415,7 +439,7 @@ option {
         width: 100vw !important;
     }
     .top-title {
-        font-size: 22px !important;
+        font-size: 18px !important;
     }
     .boxxy {
         margin-left: 60px !important;
