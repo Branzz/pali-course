@@ -151,9 +151,9 @@ impl Component for Table {
                 <div class="filler-right table-right">
                     if !disabled {
                         if self.mode.has_input() {
-                            <button class={classes!(side_options_class.clone(), "side-button", check_clicked_class.clone())} onclick={check_answers}> {"check"} </button>
+                            <button class={classes!("check", side_options_class.clone(), "side-button", check_clicked_class.clone())} onclick={check_answers}> {"check"} </button>
                         }
-                        <select class={classes!(side_options_class.clone(), "clickable")} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
+                        <select class={classes!("options", side_options_class.clone(), "clickable")} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
                             <option value="Show"           selected={"Show" == self.mode.to_string().clone()}>            {"Reveal all"} </option>
                             <option value="HoverReveal"    selected={"HoverReveal" == self.mode.to_string().clone()}>     {"Hover reveal"} </option>
                             <option value="ClickReveal"    selected={"ClickReveal" == self.mode.to_string().clone()}>     {"Click reveal"} </option>
@@ -162,7 +162,7 @@ impl Component for Table {
                             <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()} disabled={self.options_style == DropDownOptionsStyle::Disabled}> {"Drop down"} </option>
                         </select>
                         if self.mode.is_resettable() {
-                            <button class={classes!(side_options_class, "side-button")} onclick={reset}> {"↺"} </button>
+                            <button class={classes!("reset", side_options_class, "side-button")} onclick={reset}> {"↺"} </button>
                         }
                     }
                 </div>

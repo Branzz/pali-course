@@ -58,13 +58,7 @@ pub fn toolbar(props: &ToolbarProps) -> Html {
     }).unwrap_or(html! {<div> </div>} );
 
     let top = props.name.clone().map(|name| html! {
-                <div class={css!(r#"width: min-content;
-                                    text-align: center;
-                                    margin-top: 3px;
-                                    width: 1600px;
-                                    color: #f0eee8;
-                                    white-space: nowrap;
-                                 "#)}> // twice width as content
+                <div class={"top-title"}>
                     { name }
                 </div>
     }).unwrap_or(html! {<div> </div>} );

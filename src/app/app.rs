@@ -83,6 +83,16 @@ pub fn themed_content(props: &DefaultPageProps) -> Html {
 pub fn content(props: &DefaultPageProps) -> Html {
     let theme: ThemeContext = use_theme();
 
+    let main_class2 = css!{
+       r#"background-color: ${bg_c};
+                   width: 80vw;
+                   max-width: 800px;
+                   font-size: 20px;
+                   min-height: calc(100% - 140px);
+                   padding-top: 65px;
+                   padding-bottom: 75px;
+                "#, bg_c = theme.content_background_color.clone(), };
+
     return html! {
         <>
 
@@ -113,16 +123,7 @@ pub fn content(props: &DefaultPageProps) -> Html {
            align-items: baseline;
            padding-bottom: 25px;
            "#)}>
-            <div class={css!(
-                r#"background-color: ${bg_c};
-                   width: 80vw;
-                   max-width: 800px;
-                   font-size: 20px;
-                   min-height: calc(100% - 140px);
-                   padding-top: 65px;
-                   padding-bottom: 75px;
-                "#, bg_c = theme.content_background_color.clone(),
-            )}>
+            <div class={classes!("main", main_class2)}>
 
                 { props.main_content.clone() }
 
@@ -224,7 +225,7 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                 <h3> <a target="_blank" href={ "https://audtip.org/misc/paligor/ref/index.html" }>{"Verb roots"}</a> </h3>
                <h3 class="spaced"> <a target="_blank" href={ "https://www.clearmountainmonastery.org/2020/08/01/article-a-fun-way-to-memorize-long-dhamma-with-a-special-focus-on-the-dhammapada/" }>{"Memorizing"}</a> </h3>
             </div>
-            <div class="flexer"><p>{ "Chart of sounds in the mouth (bottom ones don't happen)" }</p></div>
+            <div class="flexer"><p>{ "Chart of sounds in the mouth (bottom ones don't exist)" }</p></div>
             <div class="centered preserved"> <img src="/assets/phoen.png" /> </div>
             <div class="centered preserved"> <img src="/assets/sandhi.png" /> </div>
             <div class="centered preserved"> <img src="/assets/12.png" /> </div>

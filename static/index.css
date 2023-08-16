@@ -4,7 +4,7 @@
 }
 
 html, body {
-    font-family: "Skolar Sutta Web", serif;
+    font-family: "Skolar Sutta Web", serif, Arial;
     padding: 0;
     margin: 0;
     overflow: hidden;
@@ -30,6 +30,14 @@ a:link, a:visited {
 
 .spaced {
     margin-bottom: 50px;
+}
+
+.top-title {
+    text-align: center;
+    margin-top: 3px;
+    width: 1600px; // twice width as content
+    color: #f0eee8;
+    white-space: nowrap;
 }
 
 .top-button {
@@ -107,7 +115,7 @@ a:link, a:visited {
 
 .boxxy {
     flex: 1 1 0;
-    margin: 3px;
+    margin: 10px;
     padding-bottom: 15px;
     border: 1px gray dashed;
     border-radius: 2px;
@@ -137,6 +145,7 @@ li {
     justify-content: center;
     margin-bottom: 15px;
     align-items: center;
+    flex-direction: row;
 }
 
 .table-area--dark {
@@ -260,14 +269,14 @@ table, th, td {
 }
 
 select, .table-input {
-    font-family: "Skolar Sutta Web", serif;
+    font-family: "Skolar Sutta Web", serif, Arial;
     font-size: 20px;
     border-radius: 3px;
     padding-left: 2px;
 }
 
 .side-button {
-    font-family: "Skolar Sutta Web", serif;
+    font-family: "Skolar Sutta Web", serif, Arial;
     font-size: 16px;
     border: 1px solid;
     margin-left: 10px;
@@ -365,4 +374,51 @@ option {
     border-style: solid;
     transition: 0.1s ease-in-out;
     cursor: help;
+}
+
+@media only screen and (max-width: 800px) {
+    .flex-surround {
+        display: unset;
+    }
+    .boxxy {
+        margin: 0 20px 25px !important;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    .table-right {
+        margin-top: 15px;
+        /*flex: 2;*/
+    }
+    .table-area {
+        flex-direction: column;
+
+    }
+    .check {
+        font-size: 20px !important;
+        grid-row: 1;
+        grid-column: 2;
+    }
+    .options {
+        grid-row: 1;
+        grid-column: 1;
+    }
+    .reset {
+        grid-row: 1;
+        grid-column: 3;
+        float: right;
+    }
+}
+
+@media only screen and (max-width: 550px) {
+    .main {
+        width: 100vw !important;
+    }
+    .top-title {
+        font-size: 22px !important;
+    }
+    .boxxy {
+        margin-left: 60px !important;
+        margin-right: 60px !important;
+    }
 }

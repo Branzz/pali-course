@@ -19,4 +19,3 @@ to test:
 favorite, moon sun image, favicon, themes, json link matches line
 deployment:
 copy app.js and any other changed files to (root directory).
-### the index.html file paths may need adjusting...
