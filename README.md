@@ -1,9 +1,5 @@
 
-This is the website made for learning pali from Bhante Sujato's Pali Course 2023
-
-### Website features
-* dark mode
-
+This is a website made for learning Pāli from Bhante Sujato's Pali Course 2023
 
 ### Development setup
 
