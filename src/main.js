@@ -71,7 +71,11 @@ const lessons = // { "courses": [...]}
     "exercises": [
         {
             "title": "Layout",
-            "info": "Here's an exercise with the answers covered. Click on them to reveal one-by-one. Then, see the drop down for the other modes. Some let you check your answers. You can also press TAB to switch typing/drop down between cells.",
+            "info": "Here's an exercise with the answers covered. Click on them to reveal one-by-one." +
+                " Then, see the drop down for the other modes." +
+                " They each have their own advantage such as omitting the other options or other already given answers." +
+                " Some let you check your answers." +
+                " You can also press TAB to switch between cells.",
             "table_layout": {
                 "table": [
                     ["Eng",  "Pāli"  ],
@@ -85,6 +89,17 @@ const lessons = // { "courses": [...]}
         {
             "title": "↑",
             "info": "Click the box above to show the explanation for the exercise.",
+            // "table_layout": {
+            //     "table": [
+            //         ["Exercise mode"]
+            //         ["Reveal all"]
+            //         ["Hover reveal"]
+            //         ["Click reveal"]
+            //         ["Reveal by letter"]
+            //         ["Enter text"]
+            //         ["Drop down"]
+            //     ],
+            // },
         },
         {
             "title": "Input Method",
@@ -164,7 +179,6 @@ const lessons = // { "courses": [...]}
                     ["3rd",    "bhav|ati|", "bhav|anti|"],
                 ],
                 "default_mode": "HoverReveal",
-                "options_style": "Disabled",
             }
         },
         {
@@ -173,7 +187,7 @@ const lessons = // { "courses": [...]}
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
-                    ["root",    "verb",           "meaning (he...)"],
+                    ["root",    "verb",           "meaning (one...)"],
                     ["|kam|",   "|upasaṃkamati|", "|goes to, approaches|"],
                     ["|kam|",   "|pakkamati|",    "|goes away|"],
                     ["|cu|",    "|cavati|",       "|dies|"],
@@ -234,7 +248,7 @@ const lessons = // { "courses": [...]}
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
-                    ["root",     "verb",        "meaning (he...)"],
+                    ["root",     "verb",        "meaning (one...)"],
                     ["|vis|",    "|pavisati|",  "|enters|"],
                     ["|phus|",   "|phusati|",   "|touches, reaches, attains|"],
                     ["|is|",     "|icchati|",   "|wishes, desires|"],
@@ -263,6 +277,7 @@ const lessons = // { "courses": [...]}
                     ["nom.", "-|o|",  "-|ā|"],
                     ["acc.", "-|aṃ|", "-|e|"],
                 ],
+                "default_mode": "HoverReveal",
             },
             "page": 17,
         },
@@ -272,6 +287,7 @@ const lessons = // { "courses": [...]}
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
+                    ["noun",     "meaning"],
                     ["|aggo|",   "|top|"],
                     ["|attho|",  "|prosperity, meaning...|"],
                     ["|dhammo|", "|true, natural; doctrine...|"],
@@ -286,16 +302,87 @@ const lessons = // { "courses": [...]}
                 ],
             }
         },
-
-]
+    ]
 },
-// {
-//     "name": "Lesson 3 - Nom. and Acc.",
-//     "path": "3",
-//     "exercises": [
-//
-//     ]
-// },
+{
+    "name": "Lesson 3 - 7th Conjugation",
+    "path": "3",
+    "exercises": [
+        {
+            "title": "Declension",
+            "info": "Declension that also applies to brahman and rājan.",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["meaning",     "fortunate one",],
+                    ["stem",        "bhagav|ant|",  ],
+                    ["nom. sing.",  "bhagav|ā|",    ],
+                    ["acc. sing.",  "bhagav|ataṃ|", ],
+                    ["nom. plur.",  "bhagav|ato|",  ],
+                    ["acc. plur.",  "bhagav|ato|",  ]
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 20,
+        },
+        {
+            "title": "Conjugate Dis",
+            "info": "The conjugations for a 7th conjugation verb, \"to teach\"",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"    ],
+                    ["1st",    "dese|mi|", "dese|ma|"  ],
+                    ["2nd",    "dese|si|", "dese|tha|" ],
+                    ["3rd",    "dese|ti|", "dese|nti|" ]
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 21,
+        },
+
+        {
+            "title": "Verbs",
+            "info": "7th conjugation verbs.",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["root",    "verb",          "meaning (one...)"],
+                    ["|kath|",	 "|katheti|",       "|relates, tells|"],
+                    ["|kam|",    "|kāmeti|",        "|loves|"],
+                    ["|chaḍḍ|",	 "|chaḍḍeti|",      "|throws away, abandons|"],
+                    ["|(ñ)ñap|", "|aññāpeti|",      "|prepares, declares|"],
+                    ["|dhar|",	 "|dhareti|",       "|holds, wears, has, accepts, remembers|"],
+                    ["|mant|",	 "|manteti|",       "|takes counsel, discusses|"],
+                    ["|mant|",	 "|āmanteti|",      "|addresses|"],
+                    ["|vañc|",	 "|vañceti|",       "|deceives|"],
+                    ["|vad|",	 "|abhivādeti|",    "|salutes, greets, takes leave|"],
+                    ["|vās|",    "|nivāseti|",      "|dresses|"],
+                    ["|vid|",    "|paṭisaṃvedeti|", "|feels, experiences|"],
+                    ["|veṭh|",	 "|ibbeṭheti|",	    "|untwists, unravels, explains, rebuts|"]
+                ],
+                "key_col": 1,
+            },
+            "page": 21,
+        },
+        {
+            "title": "Vocab",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["|kālo|",  	"|time|"],
+                    ["|paccayo|",   "|condition, cause|"],
+                    ["|bhāro|", 	"|burden, load|"],
+                    ["|lābho|", 	"|gain|"],
+                    ["|vipāko|",    "|result|"],
+                    ["|vihāro|",    "|life, dwelling|"],
+                    ["|hattho|",    "|hand|"]
+                ]
+            },
+            "page": 22,
+        },
+    ]
+},
 // {
 //     "name": "Lesson 4 - Aorist",
 //     "path": "4",

@@ -87,7 +87,7 @@ impl Component for Table {
             location_table,
             input_tracking: if interactive {Some(false)} else {None},
             reset: false,
-            mode: ctx.props().table_layout.default_mode.clone().unwrap_or(if interactive {ExerciseMode::ClickReveal} else {ExerciseMode::Disabled}),
+            mode: ctx.props().table_layout.default_mode.clone().unwrap_or(if interactive { ClickReveal} else { Disabled}),
             options_style: options_summary,
             type_field_size,
         }
@@ -140,7 +140,7 @@ impl Component for Table {
         });
         let check_answers = ctx.link().callback(move |_: MouseEvent| TableMsg::CheckClicked);
         let reset = ctx.link().callback(move |_: MouseEvent| TableMsg::Reset);
-        let disabled = self.mode == ExerciseMode::Disabled;
+        let disabled = self.mode == Disabled;
 
         let html = html! {
             <div class={table_area}>
@@ -254,7 +254,7 @@ impl Table {
                             _ => unreachable!()
                         }
                     },
-                    ExerciseMode::Disabled => unreachable!("creating disabled exercise mode"),
+                    Disabled => unreachable!("creating disabled exercise mode"),
                 }
             }
         }
@@ -519,9 +519,9 @@ impl ExerciseMode {
 
     fn is_resettable(&self) -> bool {
         match self {
-            ExerciseMode::ClickReveal
+            ClickReveal
             | TypeField
-            | ExerciseMode::DropDown => true,
+            | DropDown => true,
             _ => false,
         }
     }
@@ -529,7 +529,7 @@ impl ExerciseMode {
     fn has_input(&self) -> bool {
         match self {
             TypeField
-            | ExerciseMode::DropDown => true,
+            | DropDown => true,
             _ => false,
         }
     }
@@ -541,13 +541,13 @@ impl FromStr for ExerciseMode {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "Show"           => Ok(ExerciseMode::Show),
-            "HoverReveal"    => Ok(ExerciseMode::HoverReveal),
-            "ClickReveal"    => Ok(ExerciseMode::ClickReveal),
+            "Show"           => Ok(Show),
+            "HoverReveal"    => Ok(HoverReveal),
+            "ClickReveal"    => Ok(ClickReveal),
             "CensorByLetter" => Ok(CensorByLetter),
             "TypeField"      => Ok(TypeField),
-            "DropDown"       => Ok(ExerciseMode::DropDown),
-            "Disabled"       => Ok(ExerciseMode::Disabled),
+            "DropDown"       => Ok(DropDown),
+            "Disabled"       => Ok(Disabled),
             _ => Err(())
         }
     }
@@ -556,13 +556,13 @@ impl FromStr for ExerciseMode {
 impl ToString for ExerciseMode {
     fn to_string(&self) -> String {
         match self {
-            ExerciseMode::Show =>           "Show",
-            ExerciseMode::HoverReveal =>    "HoverReveal",
-            ExerciseMode::ClickReveal =>    "ClickReveal",
+            Show =>           "Show",
+            HoverReveal =>    "HoverReveal",
+            ClickReveal =>    "ClickReveal",
             CensorByLetter => "CensorByLetter",
             TypeField =>      "TypeField",
-            ExerciseMode::DropDown =>       "DropDown",
-            ExerciseMode::Disabled =>       "Disabled",
+            DropDown =>       "DropDown",
+            Disabled =>       "Disabled",
         }.to_string()
     }
 }

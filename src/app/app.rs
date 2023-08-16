@@ -197,13 +197,15 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                 </ul>
                 <ul class="boxxy">
                     <h3> { "In-progress" } </h3>
-                    <li> { "Tutorial, Lessons 1-2" } </li>
+                    <li> { "Tutorial, Lessons 1-3" } </li>
                     <li> { "Reveal-by-letter mode" } </li>
                     <li> { "Mobile friendly (mouse-hover, reactive)" } </li>
                 </ul>
                 <ul class="boxxy">
                     <h3> { "Planned / Other ideas" } </h3>
-                    <li> { "Lessons 3+" } </li>
+                    <li> { "Lessons 4+" } </li>
+                    <li> { "Verb root meanings exercise" } </li>
+                    <li> { "Multiple answers in one cell" } </li>
                     <li> { "Shuffle rows" } </li>
                     <li> { "Show the lesser definitions" } </li>
                     <li> { "Lesson 'types' section ('Verb', 'Conjugations'...)" } </li>
@@ -223,9 +225,9 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                <h3 class="spaced"> <a target="_blank" href={ "https://www.clearmountainmonastery.org/2020/08/01/article-a-fun-way-to-memorize-long-dhamma-with-a-special-focus-on-the-dhammapada/" }>{"Memorizing"}</a> </h3>
             </div>
             <div class="flexer"><p>{ "Chart of sounds in the mouth (bottom ones don't happen)" }</p></div>
-            <div class="centered preserved"> <img src="/phoen.png" /> </div>
-            <div class="centered preserved"> <img src="/sandhi.png" /> </div>
-            <div class="centered preserved"> <img src="/12.png" /> </div>
+            <div class="centered preserved"> <img src="/assets/phoen.png" /> </div>
+            <div class="centered preserved"> <img src="/assets/sandhi.png" /> </div>
+            <div class="centered preserved"> <img src="/assets/12.png" /> </div>
         </> }),
         Route::Lessons => {
             content_titled(String::from("Lessons"), Some(Route::Overview), html! { <>

@@ -23,7 +23,6 @@
   },
   "scripts": {
     "build": "rimraf dist/js && rollup --target web --bundleConfigAsCjs --config",
-    "watch": "rimraf dist/js && rollup --target web --bundleConfigAsCjs --config --watch",
-    "serve": "serve -p 7777 release"
+    "watch": "rimraf dist/js && rollup --target web --bundleConfigAsCjs --config --watch"
   }
 }

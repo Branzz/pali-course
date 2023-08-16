@@ -169,7 +169,6 @@ impl Component for TypeFieldCell {
 
         let paste = ctx.link().callback(move |e: Event| {
             let input: HtmlInputElement = e.target_unchecked_into();
-            log_display("p");
             let text_width: i32 = 0; // get_text_width(input.target);
             // input.set_length()
 
@@ -180,7 +179,6 @@ impl Component for TypeFieldCell {
         let content_changed = ctx.link().callback(move |e: InputEvent| {
             let input: HtmlInputElement = e.target_unchecked_into();
 
-            log_display("c");
             let text_width: i32 = 0; // get_text_width(input); // TODO
 
             TypeFieldCellMsg::Update(input.value(), text_width)

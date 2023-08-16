@@ -15,4 +15,4 @@ This is the website made for learning pali from Bhante Sujato's Pali Course 2023
 
 `npm install --global rollup`
 
-`yarn run build` / watch / serve
+`yarn run watch` / build 

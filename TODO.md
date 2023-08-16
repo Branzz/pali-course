@@ -13,3 +13,10 @@
 * reset button
 * allow optional titles (linked list iterator of exercises)
 * a sort of classes builder
+
+to test:
+  check every link, every mode with check and refresh,
+favorite, moon sun image, favicon, themes, json link matches line
+deployment:
+copy app.js and any other changed files to (root directory).
+### the index.html file paths may need adjusting...
