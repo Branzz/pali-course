@@ -82,6 +82,7 @@ const lessons = // { "courses": [...]}
                     ["|body|", "|kāya|"],
                     ["|time|", "|kāla|"],
                 ],
+                "default_mode": "ClickReveal",
                 "key_col": 0,
             },
             "explanation": "\"body\" in Pāli is kāya. You can guess what \"time\" is :)",
@@ -179,7 +180,6 @@ const lessons = // { "courses": [...]}
                     ["2nd",    "bhav|asi|", "bhav|atha|"],
                     ["1st",    "bhav|āmi|", "bhav|āma|"],
                 ],
-                "default_mode": "HoverReveal",
             }
         },
         {
@@ -281,7 +281,6 @@ const lessons = // { "courses": [...]}
                     ["nom.", "-|o|",  "-|ā|"],
                     ["acc.", "-|aṃ|", "-|e|"],
                 ],
-                "default_mode": "HoverReveal",
             },
             "page": 17,
         },
@@ -327,7 +326,6 @@ const lessons = // { "courses": [...]}
                     ["nom. plur.",  "bhagav|ato|",  ],
                     ["acc. plur.",  "bhagav|ato|",  ],
                 ],
-                "default_mode": "HoverReveal",
             },
             "page": 20,
         },
@@ -343,7 +341,6 @@ const lessons = // { "courses": [...]}
                     ["2nd",    "dese|si|", "dese|tha|" ],
                     ["1st",    "dese|mi|", "dese|ma|"  ],
                 ],
-                "default_mode": "HoverReveal",
             },
             "page": 21,
         },
@@ -408,7 +405,6 @@ const lessons = // { "courses": [...]}
                     ["2nd", "upasaṃkam|i|", "upasaṃkam|ittha|"],
                     ["1st", "upasaṃkam|iṃ|", "upasaṃkam|imha/imhā|"]
                 ],
-                "default_mode": "HoverReveal",
             },
             "page": 24,
         },
@@ -424,7 +420,6 @@ const lessons = // { "courses": [...]}
                     ["2nd", "des|esi|", "des|ittha|"],
                     ["1st", "des|esiṃ|", "des|imha|"]
                 ],
-                "default_mode": "HoverReveal",
             },
             "page": 25,
         },
@@ -440,7 +435,6 @@ const lessons = // { "courses": [...]}
                     ["2nd", "ak|āsi|", "ak|attha|"],
                     ["1st", "ak|āsiṃ|", "ak|amhā|"]
                 ],
-                "default_mode": "HoverReveal",
             },
             "page": 25,
         },
@@ -465,7 +459,6 @@ const lessons = // { "courses": [...]}
                     ["2nd", "ah|osi|", "ah|uvattha|"],
                     ["1st", "ah|osiṃ|", "ah|umha|"]
                 ],
-                "default_mode": "HoverReveal",
             },
             "page": 26,
         },
@@ -519,8 +512,6 @@ const lessons = // { "courses": [...]}
                     ["nom.", "I |ahaṃ|", "we |mayaṃ|"],
                     ["acc.", "me |maṃ|", "us |amhe|"],
                 ],
-                "default_mode": "HoverReveal",
-
             },
         },
         {
@@ -533,8 +524,6 @@ const lessons = // { "courses": [...]}
                     ["nom.", "you |tvaṃ|", "you all |tumhe|"],
                     ["acc.", "you |taṃ|", "you all |tumhe|"],
                 ],
-                "default_mode": "HoverReveal",
-
             },
         },
         {
@@ -547,8 +536,6 @@ const lessons = // { "courses": [...]}
                     ["nom.", "he |so|",     "she |sā|",     "they |te|",    "they |tā|"],
                     ["acc.", "him |taṃ|",   "her |taṃ|",    "them |te|",    "them |tā|"],
                 ],
-                "default_mode": "HoverReveal",
-
             },
             "page": 28,
         },
@@ -569,7 +556,6 @@ const lessons = // { "courses": [...]}
                     ["fem. plur.",  "they |tā|",        "them |tā|"],
                     ["neut. plur.", "they |tāni|",      "them |tāni|"],
                 ],
-                "default_mode": "HoverReveal",
 
             },
             "page": 28,
@@ -588,8 +574,6 @@ const lessons = // { "courses": [...]}
                     ["fem. plur.",    "|imā|",   "|imā|"],
                     ["neut. plur.",   "|imāni|", "|imāni|"],
                 ],
-                "default_mode": "HoverReveal",
-
             },
             "page": 30,
         },

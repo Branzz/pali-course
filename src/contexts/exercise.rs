@@ -110,7 +110,9 @@ pub(crate) fn exercise_component(props: &ExerciseComponentProps) -> Html {
 
     // log_display(props.exercise.table_layout.clone().unwrap().table.get(0).unwrap().get(0).unwrap());
     let info = html_if_some(props.exercise.info.clone(), |info| html! { <div class="flexer"> <p class="info">{ info } </p> </div> });
-    let table = html_if_some(props.exercise.table_layout.clone(), |table_layout| html!{ <Table key={table_id} table_layout={table_layout.clone()} theme={theme.kind.clone()} id={id_str.clone()}/> });
+    let table = html_if_some(props.exercise.table_layout.clone(), |table_layout| html!{
+        <Table key={table_id} table_layout={table_layout.clone()} theme={theme.kind.clone()} categories={props.exercise.categories.clone().unwrap_or(vec![])} id={id_str.clone()}/>
+    });
     let explanation = html_if_some(props.exercise.explanation.clone(), |explanation| {
         let mut explanation_class = theme.kind.css_class_themed("");
         explanation_class.push_str(" explanation");
@@ -208,15 +210,15 @@ impl Component for Explanation {
 
 #[derive(PartialEq, Clone, Deserialize)]
 pub enum ExerciseCategory {
-    Conjugation, Vocab, Verbs, Aorist
+    Conjugation, Verbs, Vocab, Aorist
 }
 
 impl Display for ExerciseCategory {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let to_string = match self {
                 Conjugation => "conjugation",
-                Vocab => "vocab",
                 Verbs => "verbs",
+                Vocab => "vocab",
                 Aorist => "aorist",
         };
         f.write_str(to_string)
@@ -241,8 +243,8 @@ impl ExerciseCategory {
     pub fn to_proper_string(&self) -> String {
         match self {
             Conjugation => "Conjugations",
-            Vocab => "Vocab",
             Verbs => "Verbs",
+            Vocab => "Vocab",
             Aorist => "Aorist",
             _ => "404",
         }.to_string()
@@ -253,7 +255,7 @@ impl ExerciseCategory {
 
 
     pub(crate) fn iterator() -> Iter<'static, ExerciseCategory> {
-        static EXERCISE_CATEGORIES: [ExerciseCategory; 4] = [Conjugation, Vocab, Verbs, Aorist];
+        static EXERCISE_CATEGORIES: [ExerciseCategory; 4] = [Conjugation, Verbs, Vocab, Aorist];
         EXERCISE_CATEGORIES.iter()
     }
 

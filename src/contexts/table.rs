@@ -21,8 +21,7 @@ use yew_router::prelude::*;
 
 use crate::{get_lessons_json, log_dbg, log_display, log_str};
 use crate::app::empty_html;
-use crate::contexts::{DEFAULT_SELECTION_STRING, DropDownCell, Exercise, ExerciseComponent, ExerciseComponentProps,
-                      Exercises, Lesson, Lessons, SpoilerCell, TypeFieldCell, ThemeContext, ThemeKind, ThemeProvider, Toolbar};
+use crate::contexts::{DEFAULT_SELECTION_STRING, DropDownCell, Exercise, ExerciseComponent, ExerciseComponentProps, Exercises, Lesson, Lessons, SpoilerCell, TypeFieldCell, ThemeContext, ThemeKind, ThemeProvider, Toolbar, ExerciseCategory};
 use crate::contexts::toolbar::TOOLBAR_HEIGHT;
 use crate::contexts::use_theme;
 use crate::html_if_some;
@@ -47,6 +46,7 @@ pub struct TableLayout {
 pub struct ThemedTableProps {
     pub theme: ThemeKind,
     pub table_layout: TableLayout,
+    pub categories: Vec<ExerciseCategory>,
     pub id: String,
 }
 
@@ -70,7 +70,6 @@ pub enum TableMsg {
     Error,
 }
 
-
 impl Component for Table {
     type Message = TableMsg;
     type Properties = ThemedTableProps;
@@ -81,13 +80,24 @@ impl Component for Table {
         let options_summary = create_options_style(ctx.props().table_layout.options_style_type.clone(), &parsed_table, &location_table);
         let interactive = parsed_table.iter().flat_map(|v| v).find(|c| c.is_interactive()).is_some();
         let type_field_size = max_length(&parsed_table);
+        let mode = ctx.props().table_layout.default_mode.clone().unwrap_or(
+            if interactive {
+                if ctx.props().categories.contains(&ExerciseCategory::Conjugation) {
+                    ExerciseMode::HoverReveal
+                } else { // Vocab, Verbs, other...
+                    ClickReveal
+                }
+            } else {
+                Disabled
+            }
+        );
 
         Self {
             parsed_table,
             location_table,
             input_tracking: if interactive {Some(false)} else {None},
             reset: false,
-            mode: ctx.props().table_layout.default_mode.clone().unwrap_or(if interactive { ClickReveal} else { Disabled}),
+            mode,
             options_style: options_summary,
             type_field_size,
         }
