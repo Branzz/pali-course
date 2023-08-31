@@ -164,25 +164,27 @@ const lessons = // { "courses": [...]}
     ]
 },
 {
-    "name": "Lesson 1 - First conjugation",
+    "name": "Lesson 1 - 1st Conjugation",
     "path": "1",
     "exercises": [
         {
-            "title": "Conjugate Bhū",
+            "title": "Conjugate √bhū",
+            "categories": ["Conjugation"],
             "info": "The conjugations for a 1st conjugation verb, \"to be\"",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
                     ["person", "singular",  "plural"],
-                    ["1st",    "bhav|āmi|", "bhav|āma|"],
-                    ["2nd",    "bhav|asi|", "bhav|atha|"],
                     ["3rd",    "bhav|ati|", "bhav|anti|"],
+                    ["2nd",    "bhav|asi|", "bhav|atha|"],
+                    ["1st",    "bhav|āmi|", "bhav|āma|"],
                 ],
                 "default_mode": "HoverReveal",
             }
         },
         {
             "title": "Verbs",
+            "categories": ["Verbs"],
             "info": "These are first conjugation verbs in the 3rd person singular.",
             "exercise_level": "Important",
             "table_layout": {
@@ -209,6 +211,7 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Vocab",
+            "categories": ["Vocab"],
             "info": "Masculine nouns in -a in the nominative singular.",
             "exercise_level": "Important",
             "table_layout": {
@@ -239,11 +242,12 @@ const lessons = // { "courses": [...]}
     ]
 },
 {
-    "name": "Lesson 2 - Nominative plural",
+    "name": "Lesson 2 - Nominative Plural",
     "path": "2",
     "exercises": [
         {
             "title": "Verbs",
+            "categories": ["Verbs"],
             "info": "These have irregular stems.",
             "exercise_level": "Important",
             "table_layout": {
@@ -283,6 +287,7 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Vocab",
+            "categories": ["Vocab"],
             // "info": "Masculine nouns in -a in the nominative singular.",
             "exercise_level": "Important",
             "table_layout": {
@@ -310,6 +315,7 @@ const lessons = // { "courses": [...]}
     "exercises": [
         {
             "title": "Declension",
+            // "categories[": "declension"],
             "info": "Declension that also applies to brahman and rājan.",
             "exercise_level": "Important",
             "table_layout": {
@@ -319,7 +325,7 @@ const lessons = // { "courses": [...]}
                     ["nom. sing.",  "bhagav|ā|",    ],
                     ["acc. sing.",  "bhagav|ataṃ|", ],
                     ["nom. plur.",  "bhagav|ato|",  ],
-                    ["acc. plur.",  "bhagav|ato|",  ]
+                    ["acc. plur.",  "bhagav|ato|",  ],
                 ],
                 "default_mode": "HoverReveal",
             },
@@ -327,14 +333,15 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Conjugate Dis",
+            "categories": ["Conjugation"],
             "info": "The conjugations for a 7th conjugation verb, \"to teach\"",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
                     ["person", "singular", "plural"    ],
-                    ["1st",    "dese|mi|", "dese|ma|"  ],
+                    ["3rd",    "dese|ti|", "dese|nti|" ],
                     ["2nd",    "dese|si|", "dese|tha|" ],
-                    ["3rd",    "dese|ti|", "dese|nti|" ]
+                    ["1st",    "dese|mi|", "dese|ma|"  ],
                 ],
                 "default_mode": "HoverReveal",
             },
@@ -343,6 +350,7 @@ const lessons = // { "courses": [...]}
 
         {
             "title": "Verbs",
+            "categories": ["Verbs"],
             "info": "7th conjugation verbs.",
             "exercise_level": "Important",
             "table_layout": {
@@ -367,6 +375,7 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Vocab",
+            "categories": ["Vocab"],
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
@@ -383,20 +392,285 @@ const lessons = // { "courses": [...]}
         },
     ]
 },
-// {
-//     "name": "Lesson 4 - Aorist",
-//     "path": "4",
-//     "exercises": [
-//
-//     ]
-// },
-// {
-//     "name": "Lesson 5 - Pronouns",
-//     "path": "5",
-//     "exercises": [
-//
-//     ]
-// },
+{
+    "name": "Lesson 4 - Aorist",
+    "path": "4",
+    "exercises": [
+        {
+            "title": "First Aorist Form Conjugation",
+            "categories": ["Conjugation", "Aorist"],
+            "info": "For upasaṃkamati - approaches.",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"],
+                    ["3rd", "upasaṃkam|i|", "upasaṃkam|iṃsu|"],
+                    ["2nd", "upasaṃkam|i|", "upasaṃkam|ittha|"],
+                    ["1st", "upasaṃkam|iṃ|", "upasaṃkam|imha/imhā|"]
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 24,
+        },
+        {
+            "title": "Second Aorist Form Conjugation",
+            "categories": ["Conjugation", "Aorist"],
+            "info": "For deseti - teaches.",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"],
+                    ["3rd", "des|esi|", "des|uṃ|"],
+                    ["2nd", "des|esi|", "des|ittha|"],
+                    ["1st", "des|esiṃ|", "des|imha|"]
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 25,
+        },
+        {
+            "title": "Third Aorist Form Conjugation",
+            "categories": ["Conjugation", "Aorist"],
+            "info": "For karoti - to make/do/work.",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"],
+                    ["3rd", "ak|āsi|", "ak|aṃsu|"],
+                    ["2nd", "ak|āsi|", "ak|attha|"],
+                    ["1st", "ak|āsiṃ|", "ak|amhā|"]
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 25,
+        },
+        // {
+        //     "title": "Aorist Form Verbs",
+        //     "info": "Select the aorist form of the verb.",
+        //     "table_layout": {
+        //         "table": [
+        //         ],
+        //     },
+        //     "page": 24,
+        // },
+        {
+            "title": "√hū Aorist Conjugation",
+            "categories": ["Conjugation", "Aorist"],
+            "info": "For hoti - is.",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"],
+                    ["3rd", "ah|osi|", "ah|esuṃ|"],
+                    ["2nd", "ah|osi|", "ah|uvattha|"],
+                    ["1st", "ah|osiṃ|", "ah|umha|"]
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 26,
+        },
+        {
+            "title": "Vocab",
+            "categories": ["Vocab"],
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["|atha|",  "|then|"],
+                    ["|ettha|", "|here|"],
+                    ["|kho|",   "|indeed|"],
+                    ["|ca|",    "|and|"],
+                    ["|tadā|",  "|then|"],
+                    ["|nāma|",  "|by name|"],
+                    ["|bhūtapubbaṃ|", "|formerly|"],
+                    ["|sace|",      "|if|"],
+                    ["|kumāro|",    "|boy, prince|"],
+                    ["|purohito|",  "|high priest|"],
+                    ["|māṅavo|",    "|boy, young priest|"],
+                    ["|rājaputto|", "|prince|"],
+                    ["|sahāyo|",    "|friend|"],
+                ],
+                "key_col": 0,
+            },
+            "page": 26,
+        },
+    ]
+},
+        // {
+        //     "title": "",
+        //     "info": "",
+        //     "exercise_level": "Important",
+        //     "table_layout": {
+        //         "table": [
+        //         ],
+        //     },
+        //     "page": ,
+        // },
+{
+    "name": "Lesson 5 - Pronouns",
+    "path": "5",
+    "exercises": [
+        {
+            "title": "First Person Personal Pronouns",
+            "info": "stem ma(d)",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["case", "singular", "plural"],
+                    ["nom.", "I |ahaṃ|", "we |mayaṃ|"],
+                    ["acc.", "me |maṃ|", "us |amhe|"],
+                ],
+                "default_mode": "HoverReveal",
+
+            },
+        },
+        {
+            "title": "Second Person Personal Pronouns",
+            "info": "stem ta(d)",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["case", "singular", "plural"],
+                    ["nom.", "you |tvaṃ|", "you all |tumhe|"],
+                    ["acc.", "you |taṃ|", "you all |tumhe|"],
+                ],
+                "default_mode": "HoverReveal",
+
+            },
+        },
+        {
+            "title": "Third Person Personal Pronouns",
+            "info": "stem ta(d)",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["case", "masc. sing.", "fem. sing.",   "masc. plur.",  "fem. plur."],
+                    ["nom.", "he |so|",     "she |sā|",     "they |te|",    "they |tā|"],
+                    ["acc.", "him |taṃ|",   "her |taṃ|",    "them |te|",    "them |tā|"],
+                ],
+                "default_mode": "HoverReveal",
+
+            },
+            "page": 28,
+        },
+        {
+            "title": "Third Person Personal Pronouns",
+            "info": "stem ta(d)",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    // ["case", "m. sg.",    "f. sg.",    "n. sg.",          "m. pl.",    "f. pl.",     "n. pl."],
+                    // ["nom.", "he |so|",   "she |sā|",  "it |taṃ or tad|", "they |te|", "they |tā|",  "they |tāni|"],
+                    // ["acc.", "him |taṃ|", "her |taṃ|", "it |taṃ or tad|", "them |te|", "them |tā|",  "them |tāni|"],
+                    ["gender number", "nom.",           "acc."],
+                    ["masc. sing.", "he |so|",          "him |taṃ|"],
+                    ["fem. sing.",  "she |sā|",         "her |taṃ|"],
+                    ["neut. sing.", "it |taṃ/tad|",     "it |taṃ/tad|"],
+                    ["masc. plur.", "they |te|",        "them |te|"],
+                    ["fem. plur.",  "they |tā|",        "them |tā|"],
+                    ["neut. plur.", "they |tāni|",      "them |tāni|"],
+                ],
+                "default_mode": "HoverReveal",
+
+            },
+            "page": 28,
+        },
+        {
+            "title": "Demonstrative Pronoun - this, the",
+            "info": "idaṃ-",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["gender number", "nom.",  "acc."],
+                    ["masc. sing.",   "|ayaṃ|",  "|imaṃ|"],
+                    ["fem. sing.",    "|ayaṃ|",  "|imaṃ|"],
+                    ["neut. sing.",   "|idaṃ|",  "|idaṃ|"],
+                    ["masc. plur.",   "|ime|",   "|ime|"],
+                    ["fem. plur.",    "|imā|",   "|imā|"],
+                    ["neut. plur.",   "|imāni|", "|imāni|"],
+                ],
+                "default_mode": "HoverReveal",
+
+            },
+            "page": 30,
+        },
+        {
+            "title": "√as Conjugation",
+            "categories": ["Conjugation"],
+            "info": "to be",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"],
+                    ["3rd", "|atthi|", "|santi|"],
+                    ["2nd", "|asi|", "|attha|"],
+                    ["1st", "|asmi/amhi|", "|amha/amhā|"]
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 31,
+        },
+        {
+            "title": "\"be\" Disambiguation",
+            "table_layout": {
+                "table": [
+                    ["he is", "precise meaning"],
+                    ["ahosi", "|there is/exists|"],
+                    ["bhavati", "|be/is|"],
+                    ["atthi", "|is/becomes, eternal|"]
+                ],
+                "default_mode": "DropDown",
+            },
+        },
+        {
+            "title": "vac Aorist Conjugation",
+            "categories": ["Conjugation"],
+            "info": "to say",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"],
+                    ["3rd", "|avoca|", "|avocuṃ|"],
+                    ["2nd", "|avoca/avaca|", "|avocuttha|"],
+                    ["1st", "|avocaṃ|", "|avocumha/ā|"]
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 31,
+        },
+        {
+            "title": "Cases With Vocative",
+            "table_layout": {
+                "table": [
+                    ["stem / case", "-a masc. sing.", "-a masc. plur."],
+                    ["nom.", "-|o|",  "-|ā|"],
+                    ["acc.", "-|aṃ|", "-|e|"],
+                    ["voc.", "-|a|", "-|ā|"],
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 32,
+        },
+        {
+            "title": "Vocab",
+            "categories": ["Vocab"],
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["|apeti|",       "|goes away/from|"],
+                    ["|tuṇhī|",       "|silent|"],
+                    ["|pi|",          "|also, to|"],
+                    ["|ha|",          "|indeed|"],
+                    ["|issaro|",      "|lord, god|"],
+                    ["|nirodho|",     "|cessation |"],
+                    ["|paribbājako|", "|wanderer|"],
+                    ["|mahārājā|",    "|great king|"],
+                ],
+                "key_col": 0,
+            },
+            "page": 32,
+        },
+    ]
+},
 // {
 //     "name": "Lesson 6 - Imperative",
 //     "path": "6",

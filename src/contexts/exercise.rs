@@ -16,10 +16,15 @@ use crate::contexts::{ThemeContext, use_theme, TriSplit, ThemeKind};
 use crate::contexts::{Table, TableLayout};
 use crate::contexts::table::ExerciseMode;
 use crate::contexts::{SpoilerCell, SpoilerCellProps};
+use crate::contexts::exercise::ExerciseCategory::{Conjugation, Vocab, Verbs, Aorist};
+use std::slice::Iter;
+use std::fmt::{Display, Formatter};
+use std::fmt;
 
 #[derive(PartialEq, Clone, Deserialize)]
 pub struct Exercise {
     pub exercise_level: Option<String>,
+    pub categories: Option<Vec<ExerciseCategory>>,
     pub info: Option<String>,
     pub title: Option<String>,
     pub path: Option<String>, // how to refer to it in the url
@@ -197,6 +202,59 @@ impl Component for Explanation {
                 <span class={spoil_class} onmousedown={onclick}> { text } </span>
             </div>
         }
+    }
+
+}
+
+#[derive(PartialEq, Clone, Deserialize)]
+pub enum ExerciseCategory {
+    Conjugation, Vocab, Verbs, Aorist
+}
+
+impl Display for ExerciseCategory {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let to_string = match self {
+                Conjugation => "conjugation",
+                Vocab => "vocab",
+                Verbs => "verbs",
+                Aorist => "aorist",
+        };
+        f.write_str(to_string)
+    }
+}
+
+impl FromStr for ExerciseCategory {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "conjugation" => Ok(ExerciseCategory::Conjugation),
+            "vocab" => Ok(ExerciseCategory::Vocab),
+            "verbs" => Ok(ExerciseCategory::Verbs),
+            "aorist" => Ok(ExerciseCategory::Aorist),
+            _ => Err(()),
+        }
+    }
+}
+
+impl ExerciseCategory {
+    pub fn to_proper_string(&self) -> String {
+        match self {
+            Conjugation => "Conjugations",
+            Vocab => "Vocab",
+            Verbs => "Verbs",
+            Aorist => "Aorist",
+            _ => "404",
+        }.to_string()
+    }
+}
+
+impl ExerciseCategory {
+
+
+    pub(crate) fn iterator() -> Iter<'static, ExerciseCategory> {
+        static EXERCISE_CATEGORIES: [ExerciseCategory; 4] = [Conjugation, Vocab, Verbs, Aorist];
+        EXERCISE_CATEGORIES.iter()
     }
 
 }
