@@ -138,6 +138,7 @@ impl Component for Table {
         let table_area = theme.css_class_themed("table-area");
         // let table_secondary_classes = theme.css_class_themed("table-secondary");
         let side_options_class = theme.css_class_themed("side-options");
+        let select_class = theme.css_class_themed("select");
         // let mut check = side_options_class.clone();
         // check.push_str(" check");
 
@@ -163,7 +164,7 @@ impl Component for Table {
                         if self.mode.has_input() {
                             <button class={classes!("check", side_options_class.clone(), "side-button", check_clicked_class.clone())} onclick={check_answers}> {"check"} </button>
                         }
-                        <select class={classes!("options", side_options_class.clone(), "clickable")} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
+                        <select class={classes!("options", "clickable", side_options_class.clone(), select_class)} value={self.mode.to_string().clone()} onchange={mode_switcher.clone()}>
                             <option value="Show"           selected={"Show" == self.mode.to_string().clone()}>            {"Reveal all"} </option>
                             <option value="HoverReveal"    selected={"HoverReveal" == self.mode.to_string().clone()}>     {"Hover reveal"} </option>
                             <option value="ClickReveal"    selected={"ClickReveal" == self.mode.to_string().clone()}>     {"Click reveal"} </option>
