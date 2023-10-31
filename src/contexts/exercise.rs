@@ -16,7 +16,7 @@ use crate::contexts::{ThemeContext, use_theme, TriSplit, ThemeKind};
 use crate::contexts::{Table, TableLayout};
 use crate::contexts::table::ExerciseMode;
 use crate::contexts::{SpoilerCell, SpoilerCellProps};
-use crate::contexts::exercise::ExerciseCategory::{Conjugation, Vocab, Verbs, Aorist};
+use crate::contexts::exercise::ExerciseCategory::*;
 use std::slice::Iter;
 use std::fmt::{Display, Formatter};
 use std::fmt;
@@ -210,7 +210,7 @@ impl Component for Explanation {
 
 #[derive(PartialEq, Clone, Deserialize)]
 pub enum ExerciseCategory {
-    Conjugation, Verbs, Vocab, Aorist
+    Conjugation, Verbs, Vocab, Aorist, Declension
 }
 
 impl Display for ExerciseCategory {
@@ -220,6 +220,7 @@ impl Display for ExerciseCategory {
                 Verbs => "verbs",
                 Vocab => "vocab",
                 Aorist => "aorist",
+                Declension => "declension",
         };
         f.write_str(to_string)
     }
@@ -234,6 +235,7 @@ impl FromStr for ExerciseCategory {
             "vocab" => Ok(ExerciseCategory::Vocab),
             "verbs" => Ok(ExerciseCategory::Verbs),
             "aorist" => Ok(ExerciseCategory::Aorist),
+            "declension" => Ok(ExerciseCategory::Declension),
             _ => Err(()),
         }
     }
@@ -246,7 +248,7 @@ impl ExerciseCategory {
             Verbs => "Verbs",
             Vocab => "Vocab",
             Aorist => "Aorist",
-            _ => "404",
+            Declension => "Declension",
         }.to_string()
     }
 }
@@ -255,7 +257,7 @@ impl ExerciseCategory {
 
 
     pub(crate) fn iterator() -> Iter<'static, ExerciseCategory> {
-        static EXERCISE_CATEGORIES: [ExerciseCategory; 4] = [Conjugation, Verbs, Vocab, Aorist];
+        static EXERCISE_CATEGORIES: [ExerciseCategory; 5] = [Conjugation, Verbs, Vocab, Aorist, Declension];
         EXERCISE_CATEGORIES.iter()
     }
 

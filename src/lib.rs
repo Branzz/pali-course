@@ -28,21 +28,21 @@ pub fn lib_main() {
     app::main();
 }
 
-fn log_string(s: String) {
+pub fn log_string(s: String) {
     log_str(s.as_str());
 }
 
-fn log_display<T: Display>(t: T) -> T {
+pub fn log_display<T: Display>(t: T) -> T {
     log_str(format!("{}", t).as_str());
     t
 }
 
-fn log_dbg<T: Debug>(t: T) -> T {
+pub fn log_dbg<T: Debug>(t: T) -> T {
     log_str(format!("{:?}", t).as_str());
     t
 }
 
-fn log_str(s: &str) {
+pub fn log_str(s: &str) {
     log(s);
 }
 

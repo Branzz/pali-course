@@ -78,7 +78,7 @@ const lessons = // { "courses": [...]}
                 " You can also press TAB to switch between cells.",
             "table_layout": {
                 "table": [
-                    ["Eng",  "Pāli"  ],
+                    ["Eng",    "Pāli"  ],
                     ["|body|", "|kāya|"],
                     ["|time|", "|kāla|"],
                 ],
@@ -304,6 +304,7 @@ const lessons = // { "courses": [...]}
                     ["|saddo|",  "|noise, report|"],
                     ["|sugato|", "|well-gone|"]
                 ],
+                "key_col": 0,
             }
         },
     ]
@@ -314,17 +315,17 @@ const lessons = // { "courses": [...]}
     "exercises": [
         {
             "title": "Declension",
-            // "categories[": "declension"],
+            "categories": ["Declension"],
             "info": "Declension that also applies to brahman and rājan.",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
-                    ["meaning",     "fortunate one",],
-                    ["stem",        "bhagav|ant|",  ],
-                    ["nom. sing.",  "bhagav|ā|",    ],
-                    ["acc. sing.",  "bhagav|ataṃ|", ],
-                    ["nom. plur.",  "bhagav|ato|",  ],
-                    ["acc. plur.",  "bhagav|ato|",  ],
+                    ["meaning",     "fortunate one"],
+                    ["stem",        "bhagav|ant|"  ],
+                    ["nom. sing.",  "bhagav|ā|"    ],
+                    ["acc. sing.",  "bhagav|ataṃ|" ],
+                    ["nom. plur.",  "bhagav|ato|"  ],
+                    ["acc. plur.",  "bhagav|ato|"  ],
                 ],
             },
             "page": 20,
@@ -383,7 +384,8 @@ const lessons = // { "courses": [...]}
                     ["|vipāko|",    "|result|"],
                     ["|vihāro|",    "|life, dwelling|"],
                     ["|hattho|",    "|hand|"]
-                ]
+                ],
+                "key_col": 0,
             },
             "page": 22,
         },
@@ -526,19 +528,19 @@ const lessons = // { "courses": [...]}
                 ],
             },
         },
-        {
-            "title": "Third Person Personal Pronouns",
-            "info": "stem ta(d)",
-            "exercise_level": "Important",
-            "table_layout": {
-                "table": [
-                    ["case", "masc. sing.", "fem. sing.",   "masc. plur.",  "fem. plur."],
-                    ["nom.", "he |so|",     "she |sā|",     "they |te|",    "they |tā|"],
-                    ["acc.", "him |taṃ|",   "her |taṃ|",    "them |te|",    "them |tā|"],
-                ],
-            },
-            "page": 28,
-        },
+        // {
+        //     "title": "Third Person Personal Pronouns",
+        //     "info": "stem ta(d)",
+        //     "exercise_level": "Important",
+        //     "table_layout": {
+        //         "table": [
+        //             ["case", "masc. sing.", "fem. sing.",   "masc. plur.",  "fem. plur."],
+        //             ["nom.", "he |so|",     "she |sā|",     "they |te|",    "they |tā|"],
+        //             ["acc.", "him |taṃ|",   "her |taṃ|",    "them |te|",    "them |tā|"],
+        //         ],
+        //     },
+        //     "page": 28,
+        // },
         {
             "title": "Third Person Personal Pronouns",
             "info": "stem ta(d)",
@@ -556,12 +558,12 @@ const lessons = // { "courses": [...]}
                     ["fem. plur.",  "they |tā|",        "them |tā|"],
                     ["neut. plur.", "they |tāni|",      "them |tāni|"],
                 ],
-
             },
             "page": 28,
         },
         {
             "title": "Demonstrative Pronoun - this, the",
+            "categories": ["Declension"],
             "info": "idaṃ-",
             "exercise_level": "Important",
             "table_layout": {
@@ -606,7 +608,7 @@ const lessons = // { "courses": [...]}
             },
         },
         {
-            "title": "vac Aorist Conjugation",
+            "title": "√vac Aorist Conjugation",
             "categories": ["Conjugation"],
             "info": "to say",
             "exercise_level": "Important",
@@ -623,9 +625,10 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Cases With Vocative",
+            "categories": ["Declension"],
             "table_layout": {
                 "table": [
-                    ["stem / case", "-a masc. sing.", "-a masc. plur."],
+                    ["case", "-a masc. sing.", "-a masc. plur."],
                     ["nom.", "-|o|",  "-|ā|"],
                     ["acc.", "-|aṃ|", "-|e|"],
                     ["voc.", "-|a|", "-|ā|"],
@@ -669,6 +672,187 @@ const lessons = // { "courses": [...]}
 //
 //     ]
 // },
+{
+    "name": "Lesson 8 - Further Use of Instrumental",
+    "path": "8",
+    "exercises": [
+        {
+            "title": "Instrumental Case Uses",
+            "categories": ["Vocab"],
+            "table_layout": {
+                "table": [
+                    ["type",             "example",                   "translation"],
+                    ["|Accompaniment|",  "|brāmaṇena saddhiṃ|",       "|with the priest|"],
+                    ["|Possession|",     "|sīlehi samannāgato|",      "|endowed with virtues|"],
+                    ["|Filled|",         "|saddena|",                 "|(filled) with noise|"],
+                    ["|Cause|",          "|bhagavatā vādena kupito|", "|angry at Buddha’s statement|"],
+                    ["|Cause|",          "|cīvarena santuṭṭho|",      "|satisfied with the robe|"],
+                    ["|Cause|",          "|atthena|",                 "|because of that matter|"],
+                    ["|Cause|",          "|iminā p' aṅgena|",         "|(don't go) for this reason|"],
+                    ["|Equality|",       "|samasamo vaṇṇena|",        "|quite equal in beauty|"],
+                    ["|Equality|",       "|purisena purisaṃ|",        "|a man with a man|"],
+                    ["|Price|",          "|sahassena|",               "|for a thousand|"],
+                    ["|Way|",            "|dvārena|",                 "|by the gate|"],
+                    ["|Direction|",      "|uttarāya|",                "|from north|"],
+                    ["|Manner|",         "|iminā|",                   "|in this way|"],
+                    ["|Manner|",         "|kāyena|",                  "|through body|"],
+                    ["|Manner|",         "|santena|",                 "|calmly|"],
+                    ["|Manner|",         "|kicchena|",                "|with difficulty|"],
+                    ["|Means|",          "|dānena|",                  "|by giving|"],
+                    ["|Vehicle|",        "|yānena|",                  "|by carriage|"],
+                    ["|Motive|",         "|gāravena|",                "|through respect|"],
+                    ["|Time|",           "|aparena samayena|",        "|after some time|"],
+                    ["|Time|",           "|tena samayena|",           "|at that time|"],
+                    ["|Time|",           "|accayena|",                "|through the passage|"],
+                    // ["|Age|",            "||",                        "||"],   source's typo
+                    ["|Measure|",        "|āyāmena|",                 "|in length|"],
+                    ["|Measure|",        "|jannumattena|",            "|knee-deep|"],
+                    ["|Classification|", "|Gotamo gottena|",          "|a Gotama by clan|"],
+                    ["|Classification|", "|jātivādena|",              "|in respect of class|"],
+                    ["|Dissociation|",   "|adaṇḍena|",                "|without force|"],
+                    ["|Dissociation|",   "|aññatra brāhmaṇena|",      "|except for the priest|"],
+                ],
+                "key_col": 1,
+            },
+            "page": 44,
+        },
+        {
+            "title": "gam Present Participles",
+            "categories": ["Declension"],
+            "info": "going",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["case",   "singular",   "plural"],
+                    ["nom.",   "gacch|aṃ/anto|", "gacch|antā|"],
+                    ["acc.",   "gacch|antaṃ|",   "gacch|ante|"],
+                    ["instr.", "gacch|atā|",     "gacch|antehi|"],
+                ],
+            },
+            "page": 46,
+        },
+        {
+            "title": "bhavant Pronoun",
+            "categories": ["Declension"],
+            "info": "you, sir, your honor",
+            "table_layout": {
+                "table": [
+                    ["case",   "masc. sing.", "masc. plur."],
+                    ["nom.",   "|bhavaṃ|",    "|bhavanto/bhonto|"],
+                    ["acc.",   "|bhavantaṃ|", "|bhavante|"],
+                    ["instr.", "|bhotā|",     "|bhavantehi|"],
+                    ["voc.",   "|bho|",       "|bhonto|"],
+                ],
+                "default_mode": "HoverReveal",
+            },
+            "page": 47,
+        },
+
+    ]
+},
+{
+    "name": "Lesson - 9 Passive Conjugation",
+    "path": "9",
+    "exercises": [
+        {
+            "title": "√(p)pa-hā Present Indicative Passive Conjugation",
+            "categories": ["Conjugation"],
+            "info": "pahita, give up --> it is given up",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"],
+                    ["3rd", "pah|īyati|", "pah|īyanti|"],
+                    ["2nd", "pah|īyasi|", "pah|īyata|"],
+                    ["1st", "pah|īyāmi|", "pah|īyama|"]
+                ],
+                "key_col": 0,
+            },
+            "explanation": "passive transformation: add ya or tya to the root, which often loses its last vowel.",
+            "page": 51,
+        },
+        {
+            "title": "-ā Feminine Noun Ending",
+            "categories": ["Declension"],
+            "info": "for noun, kathā",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["case",   "singular",   "plural"],
+                    ["nom.",   "kath|ā|", "kath|ā/āyo|"],
+                    ["acc.",   "kath|aṃ|",   "kath|āyo|"],
+                    ["instr.", "kath|āya|",     "kath|āhi|"],
+                ],
+            },
+            "page": 46,
+        },
+    ]
+},
+// {
+//     "name": "Lesson - 10 Future Tense",
+//     "path": "10",
+//     "exercises": [
+//
+//     ]
+// },
+{
+    "name": "Lesson - 11 Adjectives",
+    "path": "11",
+    "exercises": [
+        {
+            "title": "√man Third Conjugation",
+            "categories": ["Conjugation"],
+            "info": "pahita, give up --> it is given up",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"],
+                    ["3rd", "maññ|ati|", "maññ|anti|"],
+                    ["2nd", "maññ|asi|", "maññ|atha|"],
+                    ["1st", "maññ|āmi|", "maññ|āma|"]
+                ],
+                "key_col": 0,
+            },
+            "explanation": "forms like passive with first conjugation endings: (man + ya = mañña).",
+            "page": 51,
+        },    ]
+},
+// {
+//     "name": "Lesson - 12 Dative",
+//     "path": "12",
+//     "exercises": [
+//
+//     ]
+// },
+// {
+//     "name": "Lesson - 13",
+//     "path": "13",
+//     "exercises": [
+//
+//     ]
+// },
+// {
+//     "name": "Lesson - 14",
+//     "path": "14",
+//     "exercises": [
+//
+//     ]
+// },
+
+
+
+        //     "title": "",
+        //     "categories": [""],
+        //     "info": "",
+        //     "exercise_level": "Important",
+        //     "table_layout": {
+        //         "table": [
+        //             ["||", "||"],
+        //         ],
+        //         "key_col": 0,
+        //     },
+        //     "page": 0,
+        // },
 
 //     {
 //         "title": "anonymous",
@@ -676,5 +860,6 @@ const lessons = // { "courses": [...]}
 //
 //         ]
 //     }
+
 
 ]}

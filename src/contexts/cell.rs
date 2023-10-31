@@ -4,7 +4,7 @@ use yew::prelude::*;
 use std::collections::HashMap;
 
 use crate::{log, log_display, log_js, get_text_width};
-use crate::contexts::table::{InputTracking, Location};
+use crate::contexts::table::{Location};
 use crate::contexts::{TriSplit, ThemeKind};
 
 #[derive(Properties, PartialEq)]

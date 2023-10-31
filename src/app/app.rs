@@ -1,18 +1,14 @@
 extern crate console_error_panic_hook;
 
 use std::panic;
+
 use percent_encoding::percent_decode_str;
-use serde_wasm_bindgen::from_value;
 use stylist::yew::{Global, styled_component};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-use crate::{get_lessons_json, log_str, log_display, log_dbg};
-use crate::contexts::{Exercise, ExerciseComponent, Exercises, Lesson, Lessons, ThemeContext, ThemeProvider, Toolbar, use_theme, use_lessons, LessonsContext, LessonsProvider, ExerciseCategory};
-use std::ops::Deref;
-use std::str::FromStr;
-use itertools::Itertools;
-use std::borrow::BorrowMut;
+use crate::{get_lessons_json, log_dbg, log_display, log_str};
+use crate::contexts::{Exercise, ExerciseCategory, ExerciseComponent, Exercises, Lesson, LessonsProvider, ThemeContext, ThemeProvider, Toolbar, use_lessons, use_theme};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -204,18 +200,15 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                 </ul>
                 <ul class="boxxy">
                     <h3> { "In-progress" } </h3>
-                    <li> { "Tutorial, Lessons 1-3" } </li>
+                    <li> { "Lessons 6+" } </li>
                     <li> { "Reveal-by-letter mode" } </li>
-                    <li> { "Mobile friendly (mouse-hover, reactive)" } </li>
                 </ul>
                 <ul class="boxxy">
                     <h3> { "Planned / Other ideas" } </h3>
-                    <li> { "Lessons 4+" } </li>
                     <li> { "Verb root meanings exercise" } </li>
                     <li> { "Multiple answers in one cell" } </li>
                     <li> { "Shuffle rows" } </li>
                     <li> { "Show the lesser definitions" } </li>
-                    <li> { "Lesson 'types' section ('Verb', 'Conjugations'...)" } </li>
                 </ul>
             </div>
             <h3> <Link<Route> to={Route::LearningResources}>{ "Other Resources" }</Link<Route>></h3>
@@ -234,7 +227,6 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
             <div class="flexer"><p>{ "Chart of sounds in the mouth (bottom ones don't exist)" }</p></div>
             <div class="centered preserved"> <img src="/assets/phoen.png" /> </div>
             <div class="centered preserved"> <img src="/assets/sandhi.png" /> </div>
-            <div class="centered preserved"> <img src="/assets/12.png" /> </div>
         </> }),
         Route::Lessons => {
             content_titled(String::from("Lessons"), Some(Route::Overview), html! { <>
@@ -294,13 +286,13 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
         Route::Exercise { lesson_path, exercise_path } => {
             let lesson_position_opt = lessons.lessons.iter().position(|l: &Lesson| l.path == lesson_path);
 
-            let mut prev_lesson_path: Option<String>;
-            let mut prev_exercise_path: Option<String>;
-            let mut next_lesson_path: Option<String>;
-            let mut next_exercise_path: Option<String>;
-            let mut exercise: Exercise;
-            let mut lesson_name: String;
-            let mut return_route: Option<Route>;
+            let prev_lesson_path: Option<String>;
+            let prev_exercise_path: Option<String>;
+            let next_lesson_path: Option<String>;
+            let next_exercise_path: Option<String>;
+            let exercise: Exercise;
+            let lesson_name: String;
+            let return_route: Option<Route>;
 
             if lesson_position_opt.is_none() {
                 let exercise_category = ExerciseCategory::iterator().find(|c: &&ExerciseCategory| c.to_string() == lesson_path);

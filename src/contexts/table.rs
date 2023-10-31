@@ -136,8 +136,8 @@ impl Component for Table {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let theme = &ctx.props().theme;
         let table_area = theme.css_class_themed("table-area");
-        let table_secondary_classes = theme.css_class_themed("table-secondary");
-        let mut side_options_class = theme.css_class_themed("side-options");
+        // let table_secondary_classes = theme.css_class_themed("table-secondary");
+        let side_options_class = theme.css_class_themed("side-options");
         // let mut check = side_options_class.clone();
         // check.push_str(" check");
 
@@ -415,10 +415,6 @@ pub enum DropDownOptionsStyle {
     Disabled,
     All { options: Vec<String> },
     ByCol { col_options: Vec<Vec<String>> },
-}
-
-pub struct InputTracking {
-    pub check_table: bool,
 }
 
 impl FromStr for OptionsStyleType {
