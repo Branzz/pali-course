@@ -8,7 +8,8 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 use crate::{get_lessons_json, log_dbg, log_display, log_str};
-use crate::contexts::{Exercise, ExerciseCategory, ExerciseComponent, Exercises, Lesson, LessonsProvider, ThemeContext, ThemeProvider, Toolbar, use_lessons, use_theme};
+use crate::contexts::{Exercise, ExerciseCategory, ExerciseComponent, Exercises, Lesson,
+                      LessonsProvider, ThemeContext, ThemeProvider, Toolbar, use_lessons, use_theme, html_page};
 
 #[derive(Clone, Routable, PartialEq)]
 pub enum Route {
@@ -170,7 +171,7 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
         Route::RedirectFromHome => html! { <Redirect<Route> to={Route::Overview} /> },
         Route::Overview => content_titled(String::from("Overview"), None, html! { <>
             <div class="info">
-                <span>{"This is an interactive format from "}</span>
+                <span>{"This is an interactive format which models "}</span>
                 <a class="linked" target="_blank" href="https://archive.org/details/A.K.WarderPali/A.%20K.%20Warder%20Pali/mode/1up">{"Introduction To Pali by A.K. Warder."}</a>
                 <br/>
                 <br/>
@@ -187,7 +188,7 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
                 <a class="linked" target="_blank" href="https://github.com/Branzz/pali-course">{"open source"}</a>
                 <span>{". The lessons are stored in an intuitive "}</span>
                 <a class="linked" target="_blank" href="https://github.com/Branzz/pali-course/blob/master/src/main.js#L66">{"json format"}</a>
-                <span>{", so it would be easy to contribute to that. Most of this isn't hard-coded, so one could clone this and easily use the format for learning anything else."}</span>
+                <span>{", so it would be easy to contribute to that. Most of this isn't hard-coded, so one could clone this and use the format for learning anything else."}</span>
                 <br/>
                 <h2> { "Features" } </h2>
             </div>
@@ -284,118 +285,7 @@ pub fn switch_with_lessons(props: &SwitchLessonsProps) -> Html {
             })
         }
         Route::Exercise { lesson_path, exercise_path } => {
-            let lesson_position_opt = lessons.lessons.iter().position(|l: &Lesson| l.path == lesson_path);
-
-            let prev_lesson_path: Option<String>;
-            let prev_exercise_path: Option<String>;
-            let next_lesson_path: Option<String>;
-            let next_exercise_path: Option<String>;
-            let exercise: Exercise;
-            let lesson_name: String;
-            let return_route: Option<Route>;
-
-            if lesson_position_opt.is_none() {
-                let exercise_category = ExerciseCategory::iterator().find(|c: &&ExerciseCategory| c.to_string() == lesson_path);
-                if exercise_category.is_some() {
-                    let exercise_category = exercise_category.unwrap();
-                    let mut exercises: Vec<Exercise> = lessons.lessons.iter()
-                        .flat_map(|l: &Lesson| l.exercises.clone())
-                        .filter(|e: &Exercise| e.categories.as_ref()
-                            .map(|cs: &Vec<ExerciseCategory>| cs.contains(&exercise_category))
-                            .unwrap_or(false))
-                        .collect();
-
-                    let decoded_exercise_path = percent_decode_str(exercise_path.as_str()).decode_utf8().unwrap();
-
-                    let exercise_position_opt = exercises.iter().position(|e: &Exercise| e.effective_path() == decoded_exercise_path);
-                    if exercise_position_opt.is_none() {
-                        return content_from( html! { <> <h1> { "Unknown exercise" } </h1> <Link<Route> to={Route::Lesson {path: lesson_path.clone()}}> { "Return" } </Link<Route>> </> } )
-                    }
-                    lesson_name = exercise_category.to_proper_string();
-                    let exercise_position = exercise_position_opt.unwrap();
-
-                    if exercise_position == 0 {
-                        prev_lesson_path = None;
-                        prev_exercise_path = None;
-                    } else {
-                        prev_lesson_path = Some(lesson_path.clone());
-                        prev_exercise_path = exercises.get((exercise_position as i32 - 1) as usize).map(|e: &Exercise| e.effective_path().clone());
-                    };
-                    if exercise_position == exercises.len() - 1 {
-                        next_lesson_path = None;
-                        next_exercise_path = None;
-                    } else {
-                        next_lesson_path = Some(lesson_path.clone());
-                        next_exercise_path = exercises.get(exercise_position + 1).map(|e: &Exercise| e.effective_path().clone());
-                    };
-
-                    exercise = exercises.remove(exercise_position);
-                    return_route = Some(Route::ExerciseCategory { category: exercise_category.clone() });
-
-                } else {
-                    return content_from( html! { <> <h1> { "Unknown lesson" } </h1> <Link<Route> to={Route::Lessons} /> </> } )
-                }
-            } else {
-                let lesson_position = lesson_position_opt.unwrap();
-
-                let mut lesson: Lesson = (*lessons.lessons.get(lesson_position).unwrap()).clone();
-                let lesson_path = lesson.path;
-                lesson_name = lesson.name;
-
-                let decoded_exercise_path = percent_decode_str(exercise_path.as_str()).decode_utf8().unwrap();
-
-                let exercise_position_opt = lesson.exercises.iter().position(|e: &Exercise| e.effective_path() == decoded_exercise_path);
-                if exercise_position_opt.is_none() {
-                    return content_from( html! { <> <h1> { "Unknown exercise" } </h1> <Link<Route> to={Route::Lesson {path: lesson_path.clone()}}> { "Return" } </Link<Route>> </> } )
-                }
-                let exercise_position = exercise_position_opt.unwrap();
-                if exercise_position == 0 {
-                    if lesson_position == 0 {
-                        prev_lesson_path = None;
-                        prev_exercise_path = None;
-                    } else {
-                        let l: Option<&Lesson> = lessons.lessons.get((lesson_position as i32 - 1) as usize);
-                        prev_lesson_path = l.map(|l: &Lesson| l.path.clone());
-                        prev_exercise_path = l.map(|l: &Lesson| l.exercises.last()).flatten().map(|e| e.effective_path().clone());
-                    }
-                } else {
-                    prev_lesson_path = Some(lesson_path.clone());
-                    prev_exercise_path = lesson.exercises.get((exercise_position as i32 - 1) as usize).map(|e: &Exercise| e.effective_path().clone());
-                };
-
-                if exercise_position == lesson.exercises.len() - 1 {
-                    if lesson_position == lessons.lessons.len() - 1 {
-                        next_lesson_path = None;
-                        next_exercise_path = None;
-                    } else {
-                        let l: Option<&Lesson> = lessons.lessons.get(lesson_position + 1);
-                        next_lesson_path = l.map(|l: &Lesson| l.path.clone());
-                        next_exercise_path = l.map(|l: &Lesson| l.exercises.first()).flatten().map(|e| e.effective_path().clone());
-                    }
-                } else {
-                    next_lesson_path = Some(lesson_path.clone());
-                    next_exercise_path = lesson.exercises.get(exercise_position + 1).map(|e: &Exercise| e.effective_path().clone());
-                };
-
-                exercise = lesson.exercises.remove(exercise_position);
-                return_route = Some(Route::Lesson { path: lesson_path.clone() });
-            }
-
-            let prev_route = prev_lesson_path.map(|lesson_path| prev_exercise_path.map(|exercise_path| {
-                Some(Route::Exercise { lesson_path, exercise_path })
-            }).unwrap_or(None)).unwrap_or(None);
-            let next_route = next_lesson_path.map(|lesson_path| next_exercise_path.map(|exercise_path| {
-                Some(Route::Exercise { lesson_path, exercise_path })
-            }).unwrap_or(None)).unwrap_or(None);
-
-            content_from_toolbar(
-                html! {
-                    <Toolbar name={lesson_name} return_route={return_route} prev_route={prev_route} next_route={next_route}/>
-                },
-                html! {
-                    <ExerciseComponent lesson_path={Option::<String>::None} exercise={exercise}/>
-                }
-            )
+            html_page(lessons, lesson_path, exercise_path)
         },
         Route::NotFound => content_titled("404".to_string(), Some(Route::Overview), html! {
             <h1>{ "Not found" }</h1>

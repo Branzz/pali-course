@@ -150,6 +150,7 @@ h3 {
     flex: 1 1 0;
     margin: 10px;
     padding-bottom: 15px;
+    padding-left: 0;
     border: 1px gray dashed;
     border-radius: 2px;
 }

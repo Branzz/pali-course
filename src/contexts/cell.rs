@@ -264,7 +264,7 @@ const ISO_MAP: [(&str, &str); 10] = [
 
 fn convert_iso_shorthand(mut shorthand: String) -> String {
     for (from, to) in &ISO_MAP {
-        shorthand = shorthand.replace(from, to.clone());
+        shorthand = shorthand.replace(from, to);
     }
     shorthand
 }

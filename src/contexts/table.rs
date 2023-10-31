@@ -352,7 +352,7 @@ fn split_bars(str: String) -> ParsedCell {
     if left.is_some() {
         let (start, middle) = str.split_at(left.unwrap());
         let (_, middle) = middle.split_at(1);
-        let right: Option<usize> = middle.clone().find("|");
+        let right: Option<usize> = middle.find("|");
         if right.is_some() {
             let (middle, end) = middle.split_at(right.unwrap());
             let (_, end) = end.split_at(1);
