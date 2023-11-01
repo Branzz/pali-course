@@ -169,7 +169,7 @@ const lessons = // { "courses": [...]}
     "path": "1",
     "exercises": [
         {
-            "title": "Conjugate √bhū",
+            "title": "√bhū Conjugation",
             "categories": ["Conjugation"],
             "info": "The conjugations for a 1st conjugation verb, \"to be\"",
             "exercise_level": "Important",
@@ -314,7 +314,7 @@ const lessons = // { "courses": [...]}
     "path": "3",
     "exercises": [
         {
-            "title": "Declension",
+            "title": "bhagav- Declension",
             "categories": ["Declension"],
             "info": "Declension that also applies to brahman and rājan.",
             "exercise_level": "Important",
@@ -331,7 +331,7 @@ const lessons = // { "courses": [...]}
             "page": 20,
         },
         {
-            "title": "Conjugate Dis",
+            "title": "√dis Conjugation",
             "categories": ["Conjugation"],
             "info": "The conjugations for a 7th conjugation verb, \"to teach\"",
             "exercise_level": "Important",
@@ -353,7 +353,7 @@ const lessons = // { "courses": [...]}
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
-                    ["root",    "verb",          "meaning (one...)"],
+                    ["root",     "verb",            "meaning (one...)"],
                     ["|kath|",	 "|katheti|",       "|relates, tells|"],
                     ["|kam|",    "|kāmeti|",        "|loves|"],
                     ["|chaḍḍ|",	 "|chaḍḍeti|",      "|throws away, abandons|"],
@@ -397,8 +397,8 @@ const lessons = // { "courses": [...]}
     "exercises": [
         {
             "title": "First Aorist Form Conjugation",
-            "categories": ["Conjugation", "Aorist"],
-            "info": "For upasaṃkamati - approaches.",
+            "categories": ["Aorist"],
+            "info": "For upasaṃkamati - approaches ➜ approached",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
@@ -412,8 +412,8 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Second Aorist Form Conjugation",
-            "categories": ["Conjugation", "Aorist"],
-            "info": "For deseti - teaches.",
+            "categories": ["Aorist"],
+            "info": "For deseti - teaches ➜ taught",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
@@ -427,8 +427,8 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "Third Aorist Form Conjugation",
-            "categories": ["Conjugation", "Aorist"],
-            "info": "For karoti - to make/do/work.",
+            "categories": ["Aorist"],
+            "info": "For karoti - makes/does/works ➜ made/did/worked",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
@@ -451,8 +451,8 @@ const lessons = // { "courses": [...]}
         // },
         {
             "title": "√hū Aorist Conjugation",
-            "categories": ["Conjugation", "Aorist"],
-            "info": "For hoti - is.",
+            "categories": ["Aorist"],
+            "info": "For hoti - is ➜ was",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
@@ -609,8 +609,8 @@ const lessons = // { "courses": [...]}
         },
         {
             "title": "√vac Aorist Conjugation",
-            "categories": ["Conjugation"],
-            "info": "to say",
+            "categories": ["Aorist"],
+            "info": "For vacati - says ➜ said",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
@@ -756,7 +756,7 @@ const lessons = // { "courses": [...]}
     "exercises": [
         {
             "title": "√(p)pa-hā Present Indicative Passive Conjugation",
-            "categories": ["Conjugation"],
+            "categories": ["Tam"],
             "info": "pahita, give up --> it is given up",
             "exercise_level": "Important",
             "table_layout": {
@@ -774,14 +774,14 @@ const lessons = // { "courses": [...]}
         {
             "title": "-ā Feminine Noun Ending",
             "categories": ["Declension"],
-            "info": "for noun, kathā",
+            "info": "For kathā",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
-                    ["case",   "singular",   "plural"],
-                    ["nom.",   "kath|ā|", "kath|ā/āyo|"],
-                    ["acc.",   "kath|aṃ|",   "kath|āyo|"],
-                    ["instr.", "kath|āya|",     "kath|āhi|"],
+                    ["case",   "singular",  "plural"],
+                    ["nom.",   "kath|ā|",   "kath|ā/āyo|"],
+                    ["acc.",   "kath|aṃ|",  "kath|āyo|"],
+                    ["instr.", "kath|āya|", "kath|āhi|"],
                 ],
             },
             "page": 46,
@@ -802,20 +802,20 @@ const lessons = // { "courses": [...]}
         {
             "title": "√man Third Conjugation",
             "categories": ["Conjugation"],
-            "info": "pahita, give up --> it is given up",
+            "info": "pahita, give up ➜ it is given up",
             "exercise_level": "Important",
             "table_layout": {
                 "table": [
                     ["person", "singular", "plural"],
-                    ["3rd", "maññ|ati|", "maññ|anti|"],
-                    ["2nd", "maññ|asi|", "maññ|atha|"],
-                    ["1st", "maññ|āmi|", "maññ|āma|"]
+                    ["3rd", "ma|ññati|", "ma|ññanti|"],
+                    ["2nd", "ma|ññasi|", "ma|ññatha|"],
+                    ["1st", "ma|ññāmi|", "ma|ññāma|"]
                 ],
-                "key_col": 0,
             },
             "explanation": "forms like passive with first conjugation endings: (man + ya = mañña).",
             "page": 51,
-        },    ]
+        },
+    ]
 },
 // {
 //     "name": "Lesson - 12 Dative",
@@ -824,22 +824,75 @@ const lessons = // { "courses": [...]}
 //
 //     ]
 // },
-// {
-//     "name": "Lesson - 13",
-//     "path": "13",
-//     "exercises": [
-//
-//     ]
-// },
-// {
-//     "name": "Lesson - 14",
-//     "path": "14",
-//     "exercises": [
-//
-//     ]
-// },
+{
+    "name": "Lesson 13 - Compounds and Causative",
+    "path": "13",
+    "exercises": [
+        {
+            "title": "√bhū Present Causative Conjugation",
+            "categories": ["Tam"],
+            "info": "causes to be",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular", "plural"],
+                    ["3rd", "|bhāveti|", "|bhāventi|"],
+                    ["2nd", "|bhāvesi|", "|bhāvetha|"],
+                    ["1st", "|bhāvemi|", "|bhāvema|"]
+                ],
+            },
+            "explanation": "stems form like seventh conjugation.",
+            "page": 80,
+        },
+    ]
+},
+{
+    "name": "Lesson 14 - Optative and Ablative",
+    "path": "14",
+    "exercises": [
+        {
+            "title": "√bhū Optative Conjugation",
+            "categories": ["Tam"],
+            "info": "should/could/may be",
+            "exercise_level": "Important",
+            "table_layout": {
+                "table": [
+                    ["person", "singular",  "plural"],
+                    ["3rd", "bhav|eyya|",   "bhav|eyyuṃ|"],
+                    ["2nd", "bhav|eyyāsi|", "bhav|eyyātha|"],
+                    ["1st", "bhav|eyyaṃ|",  "bhav|eyyāma|"]
+                ],
+            },
+            "page": 86,
+        },
+        {
+            "title": "Optative Uses",
+            "table_layout": {
+                "table": [
+                    ["|mild command|"],
+                    ["|strong injunction|"],
+                    ["|request|"],
+                    ["|supposition|"],
+                    ["|invitation|"],
+                    ["|wish|"],
+                    ["|possibility|"],
+                    ["|hypothesis|"],
+                    ["|hypothetical|"],
+                    ["|condition|"],
+                ],
+            },
+            "page": 87,
+        },
+    ]
+},
 
 
+/*
+Lesson 15 - Fifth Conjugation
+Lesson 16 - Locative Case
+Lesson 17 - AA Declension
+Lesson 18 - i Declension
+ */
 
         //     "title": "",
         //     "categories": [""],

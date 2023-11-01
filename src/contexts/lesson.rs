@@ -39,8 +39,6 @@ pub struct Lessons {
     pub lessons: Vec<Lesson>
 }
 
-
-
 #[derive(Clone)]
 pub(crate) struct LessonsContext {
     inner: UseStateHandle<Lessons>,

@@ -20,8 +20,6 @@ use crate::app::{content_from, content_from_toolbar, empty_html, Route};
 use crate::contexts::{Lesson, ThemeContext, ThemeKind, TriSplit, use_lessons, use_theme, Table, TableLayout, Toolbar, SpoilerCell, SpoilerCellProps, LessonsContext, Lessons};
 use crate::contexts::exercise::ExerciseCategory::*;
 use crate::contexts::table::ExerciseMode;
-use crate::contexts::{ Exercises,
-                      LessonsProvider,  ThemeProvider, };
 
 #[derive(PartialEq, Clone, Deserialize)]
 pub struct Exercise {
@@ -213,13 +211,14 @@ impl Component for Explanation {
 
 #[derive(PartialEq, Clone, Deserialize)]
 pub enum ExerciseCategory {
-    Conjugation, Verbs, Vocab, Aorist, Declension
+    Conjugation, Tam, Verbs, Vocab, Aorist, Declension
 }
 
 impl Display for ExerciseCategory {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let to_string = match self {
                 Conjugation => "conjugation",
+                Tam => "tam",
                 Verbs => "verbs",
                 Vocab => "vocab",
                 Aorist => "aorist",
@@ -235,6 +234,7 @@ impl FromStr for ExerciseCategory {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "conjugation" => Ok(ExerciseCategory::Conjugation),
+            "tam" => Ok(ExerciseCategory::Tam),
             "vocab" => Ok(ExerciseCategory::Vocab),
             "verbs" => Ok(ExerciseCategory::Verbs),
             "aorist" => Ok(ExerciseCategory::Aorist),
@@ -248,6 +248,7 @@ impl ExerciseCategory {
     pub fn to_proper_string(&self) -> String {
         match self {
             Conjugation => "Conjugations",
+            Tam => "Tense-Aspect-Mood",
             Verbs => "Verbs",
             Vocab => "Vocab",
             Aorist => "Aorist",
@@ -260,7 +261,7 @@ impl ExerciseCategory {
 
 
     pub(crate) fn iterator() -> Iter<'static, ExerciseCategory> {
-        static EXERCISE_CATEGORIES: [ExerciseCategory; 5] = [Conjugation, Verbs, Vocab, Aorist, Declension];
+        static EXERCISE_CATEGORIES: [ExerciseCategory; 6] = [Conjugation, Tam, Verbs, Vocab, Aorist, Declension];
         EXERCISE_CATEGORIES.iter()
     }
 

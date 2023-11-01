@@ -104,13 +104,11 @@ impl Component for DropDownCell {
         });
 
         let checked_class = check_input(ctx.props().check_mode, self.selected.clone(), ctx.props().text.middle.clone());
-
-        let mut class = ctx.props().class.clone();
-        class.push_str(" table-input");
+        // let theme = &ctx.props().theme;
 
         return html! {
             <td class={checked_class}> { text.start }
-                <select class={class} onchange={dropdown_changed.clone()} required={true}>
+                <select class={ctx.props().class.clone()} onchange={dropdown_changed.clone()} required={true}>
                     <option value={DEFAULT_SELECTION_STRING.clone()} disabled={true} selected={true} hidden={true}> {DEFAULT_SELECTION_STRING.clone()} </option>
                     { for (&ctx).props().options.iter().map(|o| { html! {
                         <option value={o.clone()}>{o}</option>

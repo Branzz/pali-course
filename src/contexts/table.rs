@@ -169,8 +169,8 @@ impl Component for Table {
                             <option value="HoverReveal"    selected={"HoverReveal" == self.mode.to_string().clone()}>     {"Hover reveal"} </option>
                             <option value="ClickReveal"    selected={"ClickReveal" == self.mode.to_string().clone()}>     {"Click reveal"} </option>
                          // <option value="CensorByLetter" selected={"CensorByLetter" == self.mode.to_string().clone()}>  {"Reveal by letter"} </option>
-                            <option value="TypeField"      selected={"TypeField" == self.mode.to_string().clone()}>       {"Enter text"} </option>
-                            <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()} disabled={self.options_style == DropDownOptionsStyle::Disabled}> {"Drop down"} </option>
+                            <option value="TypeField"      selected={"TypeField" == self.mode.to_string().clone()} disabled={self.options_style == DropDownOptionsStyle::Disabled}> {"Enter text"} </option>
+                            <option value="DropDown"       selected={"DropDown" == self.mode.to_string().clone()}  disabled={self.options_style == DropDownOptionsStyle::Disabled}> {"Drop down"} </option>
                         </select>
                         if self.mode.is_resettable() {
                             <button class={classes!("reset", side_options_class, "side-button")} onclick={reset}> {"↺"} </button>
@@ -245,9 +245,9 @@ impl Table {
 
                                 let check_mode = self.is_checking_unwrap();
 
+                                table_input.push_str(" type-field ");
                                 match self.mode.clone() {
                                     TypeField => {
-                                        table_input.push_str(" type-field");
                                         html! { <TypeFieldCell text={text} class={table_input} check_mode={check_mode} size={self.type_field_size[location.1]} key={key} /> }
                                     },
                                     DropDown => {
@@ -256,6 +256,8 @@ impl Table {
                                             DropDownOptionsStyle::All { options } => options.clone(),
                                             DropDownOptionsStyle::ByCol { col_options } => col_options.get(location.1).unwrap().clone(),
                                         };
+                                        let select_class = theme.css_class_themed("select");
+                                        table_input.push_str(select_class.as_str());
 
                                         html! { <DropDownCell text={text.clone()} class={table_input} location={location.clone()} options={options} check_mode={check_mode} key={key} /> }
                                     }
@@ -300,6 +302,10 @@ fn predict_options_style_type(options_style_type: Option<OptionsStyleType>, pars
         return options_style_type.unwrap();
     }
 
+    if parsed_table.len() == 1 || parsed_table.iter().filter(|v| v.len() != 1 as usize).count() == 0 {
+        return OptionsStyleType::Disabled;
+    }
+
     let top_left_opt: Option<&Location> = location_table.iter().flat_map(|v| v)
         .find(|l: &&Location| parsed_table.get_location_unchecked(l).is_interactive());
     if top_left_opt.is_none() {
@@ -314,6 +320,7 @@ fn predict_options_style_type(options_style_type: Option<OptionsStyleType>, pars
     let extends_horizontally = top_left.1 == 0 && bottom_right.1 == parsed_table.get(bottom_right.0).unwrap().len() - 1;
 
     if extends_horizontally {
+
         let forms_a_grid = location_table.iter().flat_map(|v| v).find(|loc: &&Location| {
             // let loc: Location = *loc_ref.clone();
             if parsed_table.get_location_unchecked(loc).is_interactive()
